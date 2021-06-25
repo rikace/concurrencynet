@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="AgentInterfaces.fs" />
+        <Compile Include="AgentParDegree.fs" />
+        <Compile Include="AsyncBoundedQueue.fs" />
+        <Compile Include="AsyncObjectPool.fs" />
+        <Compile Include="BatchProcessingAgent.fs" />
+        <Compile Include="BlockingQueueAgent.fs" />
+        <Compile Include="CrawlerAgent.fs" />
+        <Compile Include="ImageHandlers.fs" />
+        <Compile Include="ImagePipeline.fs" />
+        <Compile Include="ParallelWorker.fs" />
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Common\Helpers.FSharp\Helpers.FSharp.fsproj" />
+      <ProjectReference Include="..\..\Common\Helpers\Helpers.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
+    </ItemGroup>
+
+</Project>

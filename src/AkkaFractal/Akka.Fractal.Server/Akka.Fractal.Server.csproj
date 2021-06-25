@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Akka.Remote" Version="1.4.20" />
+      <PackageReference Include="Lib.AspNetCore.ServerSentEvents" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Akka.Fractal.Core\Akka.Fractal.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Views\.DS_Store" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="akka.conf">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>

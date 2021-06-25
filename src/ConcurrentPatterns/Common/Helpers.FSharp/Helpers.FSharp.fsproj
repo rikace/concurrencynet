@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="TaskExtension.fs" />
+    <Compile Include="AsyncEx.fs" />
+    <Compile Include="Memoize.fs" />
+    <Compile Include="Atom.fs" />
+    <Compile Include="Infrastructure\TaskEx.fs" />
+    <Compile Include="Infrastructure\Observable.fs" />
+    <Compile Include="Infrastructure\AgentRef.fs" />
+    <Compile Include="Infrastructure\AsyncResult.fs" />
+    <Compile Include="Infrastructure\AgentEx.fs" />
+    <Compile Include="Infrastructure\InfrastructureTask.fs" />
+    <Compile Include="Infrastructure\OptionEx.fs" />
+    <Compile Include="Infrastructure\BTree.fs" />
+    <Compile Include="Infrastructure\Utils.fs" />
+    <Compile Include="Infrastructure\ImageHandler.fs" />
+    <Compile Include="Infrastructure\ParallelHelpers.fs" />
+    <Compile Include="Infrastructure\ParallelSeq.fs" />
+    <Compile Include="Infrastructure\AsyncInterop.fs" />
+    <Compile Include="Infrastructure\JaroWinkler.fs" />
+    <Compile Include="Infrastructure\Interop.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0005" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0005" />
+    <PackageReference Include="System.Reactive.Linq" Version="4.1.0" />
+  </ItemGroup>
+
+</Project>

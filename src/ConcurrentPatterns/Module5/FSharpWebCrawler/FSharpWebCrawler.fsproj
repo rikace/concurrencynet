@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="AssemblyInfo.fs" />
+        
+        <Compile Include="Asynchronous\AsyncCombinators.fs" />
+        <Compile Include="Asynchronous\AsyncModule.fs" />
+        <Compile Include="Asynchronous\Async.fs" />
+        <None Include="Asynchronous\AsyncScript.fsx" />
+
+        <Compile Include="Common\Helpers.fs" />
+        <Compile Include="Common\Interfaces.fs" />
+        <Compile Include="MessagePassing\Agent.fs" />
+        <Compile Include="MessagePassing\ReactiveAgent.fs" />
+        <Compile Include="MessagePassing\AgentPipeline.fs" />
+        <Compile Include="WebCrawler\AgentWebCrawler.fs" />
+        <Compile Include="Program.fs" />
+        <None Include="AsyncScript.fsx" />
+        <None Include="AgentScript.fsx" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.33" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
+    </ItemGroup>
+
+</Project>
