@@ -54,7 +54,7 @@ Version:            2.0.0
 # Course Topic 
 ## Modules
 
-The course is split into 5 modules, each of them contains a presentation (theory) and one exercise (practice).
+The course is split into 6 modules, each of them contains a presentation (theory) and one exercise (practice).
 Slides can be downloaded [here](https://www.dropbox.com/sh/kwjftub4zdkhreb/AACf858uJGU9E-t9MK2bjfGta?dl=0)
 
 ### Module 1
