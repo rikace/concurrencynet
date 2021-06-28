@@ -29,8 +29,8 @@ namespace BenchmarkParallelPatterns
         [Benchmark]
         public double ParallelForMonteCarlo() => PiMontecarlo.ParallelForCalculate(iterations);
 
-        // [Benchmark]
-        // public double ParallelPiMonteCarlo() => PiMontecarlo.ParallelPiMonteCarlo(iterations);
+         [Benchmark]
+         public double ParallelPiMonteCarlo() => PiMontecarlo.ParallelPiMonteCarlo(iterations);
     }
 
 
@@ -71,7 +71,10 @@ namespace BenchmarkParallelPatterns
             // dotnet run -c RELEASE --project Benchmarking.csproj
 
             //BenchmarkRunner.Run<BenchmarkQuickSort>();
+
+            // dotnet run -c RELEASE --project Benchmarking.csproj
             BenchmarkRunner.Run<BenchmarkMonteCarlo>();
+
             // BenchmarkRunner.Run<StringsWithSpan>();
         }
     }

@@ -51,6 +51,7 @@ namespace ParallelPatterns
                         if (Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1)
                             inCircleLocalCounter++;
                     }
+
                     inCircleLocal[procIndex] = inCircleLocalCounter;
                 });
             }
@@ -58,7 +59,7 @@ namespace ParallelPatterns
             Task.WaitAll(tasks);
 
             var inCircle = inCircleLocal.Sum();
-            return ((double)inCircle / iterations) * 4;
+            return ((double) inCircle / iterations) * 4;
         }
 
         public static double ParallelForCalculate(int iterations)
@@ -67,6 +68,7 @@ namespace ParallelPatterns
             int inCircle = 0;
             var random = new Helpers.ThreadSafeRandom();
 
+            // 2
             Parallel.For(0, iterations, i =>
             {
                 double a, b;
@@ -80,13 +82,18 @@ namespace ParallelPatterns
                 if (c <= 1)
                     Interlocked.Increment(ref inCircle);
             });
-            return ((double)inCircle / iterations) * 4;
+
+            return ((double) inCircle / iterations) * 4;
         }
 
         public static double ParallelPiMonteCarlo(int iterations)
         {
             int inCircle = 0;
             var random = new Helpers.ThreadSafeRandom();
+
+            // Parallel.For/Foreach  + ThreadLocal
+            // CAS
+            //
 
             // TODO
             // Implement a better "Parallel.For" using these option constructs:
@@ -95,9 +102,45 @@ namespace ParallelPatterns
             // UNCOMMENT : Parallel.For(0, iterations,
             //             name of ThreadLocal variable "tLocal
 
-                    //double a, b;
-                    //return tLocal += Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1 ? 1 : 0;
+            //double a, b;
+            //return tLocal += Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1 ? 1 : 0;
+            Parallel.For(0, iterations,
+                // doesn't make sense to use more threads than we have processors
+                new ParallelOptions() {MaxDegreeOfParallelism = Environment.ProcessorCount},
+                () => 0,
+                (i, _, tLocal) =>
+                {
+                    double a, b;
+                    return tLocal += Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1
+                        ? 1
+                        : 0;
+                },
+                subTotal => Interlocked.Add(ref inCircle, subTotal));
 
+
+            return ((double) inCircle / iterations) * 4;
+        }
+
+        public static double PLINQCalculate(int iterations)
+        {
+            var random = new Helpers.ThreadSafeRandom();
+            var inCircle = ParallelEnumerable.Range(0, iterations)
+                // doesn't make sense to use more threads than we have processors
+                .WithDegreeOfParallelism(Environment.ProcessorCount)
+                .Select(_ =>
+                {
+                    double a, b;
+                    return Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1;
+                })
+                .Aggregate<bool, int, int>(
+                    0, // Seed
+                    (agg, val) => val ? agg + 1 : agg, // Iterations
+                    (agg, subTotal) => agg + subTotal, // Aggregating subtotals
+                    result => result); // No projection of result needed
+
+
+            // Implement the sum of the parallel query using the apposite operator
+            // NOTE : check the "Aggregate" as possible solution
             return ((double) inCircle / iterations) * 4;
         }
     }
