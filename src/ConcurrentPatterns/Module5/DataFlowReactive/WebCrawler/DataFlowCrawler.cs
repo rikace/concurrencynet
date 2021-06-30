@@ -13,7 +13,7 @@ namespace DataflowReactive
     using System.Linq;
     using Memoization = ConcurrentPatterns.Memoization;
 
-    // TODO RTZ
+    // TODO RT
     public static class DataFlowCrawler
     {
         static int index = 0;
@@ -40,6 +40,13 @@ namespace DataflowReactive
         // How can we make this value ThreadSafe and provide better performance?
         private static Regex httpRgx = new Regex(@"^(http|https|www)://.*$");
 
+        public static Func<T, R> MemoizeThreadSafe<T, R>(Func<T, R> func) where T : IComparable
+        {
+            ConcurrentDictionary<T, R> cache = new ConcurrentDictionary<T, R>();
+            return arg => cache.GetOrAdd(arg, a => func(a));
+        }
+
+
         public static IDisposable Start(List<string> urls, Func<string, byte[], Task> compute)
         {
             // TODO 2
@@ -49,7 +56,7 @@ namespace DataflowReactive
             var downloaderOptions = new ExecutionDataflowBlockOptions()
             {
                 // TODO should we pass the MaxDegreeOfParallelism as input/argument in function
-                MaxDegreeOfParallelism = 1
+                MaxDegreeOfParallelism = 1 // more then 1
             };
 
             // TODO 1
@@ -58,6 +65,9 @@ namespace DataflowReactive
             // Can you avoid to re-compute the same page?
             // Look into the "Memoize.cs" file for ideas
             Func<string, Task<string>> downloadUrl = default; // add the missing code implementation
+
+            // 1 - Dictionary/ ConcurrentDictionary
+            //     lastBlock.LinkTo(downloadUrl, url => checking on shared collection)
 
             var downloader = new TransformBlock<string, string>(downloadUrl
                 // TODO 1

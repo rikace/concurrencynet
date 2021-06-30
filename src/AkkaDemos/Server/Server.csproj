@@ -3,7 +3,6 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
-        <RootNamespace>Akka.Remote</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,13 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Akka.Fractal.Core\Akka.Fractal.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="akka.conf">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+      <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
 </Project>
