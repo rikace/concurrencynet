@@ -27,8 +27,17 @@ namespace ReactiveStockTickers
             using (var stream = File.OpenRead(Path.Combine(tickerPath, _filePath)))
             using (var reader = new StreamReader(stream))
             {
-                // TODO : create/convert to async operation
-                //        possibly convert into IAsyncEnumerable
+                // TODO : create/convert ReadAllLinesAsync to IAsyncEnumerable
+                // TODO RT
+                // public static async IAsyncEnumerable<string> ReadAllLinesAsync(string filePath)
+                // {
+                //     using FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite,
+                //         0x1000, true);
+                //     using StreamReader reader = new StreamReader(stream);
+                //     while(!reader.EndOfStream)
+                //         yield return await reader.ReadLineAsync();
+                // }
+                //
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
@@ -44,7 +53,7 @@ namespace ReactiveStockTickers
         }
 
         // TODO : enable Task scheduler to generate the stream of events concurrently
-        public IObservable<T> ObserveLines() => GetLines().ToObservable();
+        public IObservable<T> ObserveLines() => GetLines().ToObservable(TaskPoolScheduler.Default);
     }
 
 }

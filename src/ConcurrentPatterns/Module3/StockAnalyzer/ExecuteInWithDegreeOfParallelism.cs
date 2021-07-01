@@ -18,9 +18,17 @@ namespace StockAnalyzer
             // Implement logic that runs the "projection" for
             // each item in the "collection" with degree of parallelism "degreeOfParallelism"
             // NOTE the "queue" (ConcurrentQueue) could help, but it is not required
-            var queue = new ConcurrentQueue<T>(collection);
 
-            Task[] tasks = null;
+            var queue = new ConcurrentQueue<T>(collection);
+            var tasks = Enumerable.Range(0, degreeOfParallelism)
+                .Select(async _ =>
+                {
+                    T item;
+                    while (queue.TryDequeue(out item))
+                    {
+                        await projection(item);
+                    }
+                });
 
             await Task.WhenAll(tasks);
         }

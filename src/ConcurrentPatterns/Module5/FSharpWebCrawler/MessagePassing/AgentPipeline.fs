@@ -16,7 +16,7 @@ open SixLabors.ImageSharp
 open SixLabors.ImageSharp.PixelFormats
 
 // Step (1) implement a structured agent that returns
-//          the result of the computation "computation" over the message received
+//          the rusult of the computation "computation" over the message received
 //
 //          try to handle messages that could run a computation either "sync" or "async"
 //          TIP: you could have a DU to handle a different type of message (to run either Sync or Async)
@@ -32,19 +32,24 @@ let agent computation = Agent<'a * AsyncReplyChannel<'b>>.Start(fun inbox ->
     loop() )
 
 // Step (2) compose agents implementing the "pipeline" function.
-//          The idea of this function is to use the previously implemented
+//          The idead of this function is to use the previously implemented
 //          well structured agent (in step 1), to pass a message and return the result of the
-//          agent computation.
+//          agent compoutation.
 //          - Try also to implement a function that handle Async computation
 
+//let pipelineAsyncAgent (f:'a -> Async<'b>) (m: 'a) : Async<'b> =
+//    let a = agent f
+//    a.PostAndAsyncReply(fun replyChannel -> m, replyChannel)
+
 let pipelineAgent (f:'a -> 'b) (m: 'a) : Async<'b> =
-    async.Return(Unchecked.defaultof<_>) // Replace with code implementation
+    let a = agent f
+    a.PostAndAsyncReply(fun replyChannel -> m, replyChannel)
 
 
 // Step (3) compose pipeline
 // given two agents (below), compose them into a pipeline
 // in a way that calling (or sending a message) to the pipeline,
-// the message is passed across all the agents in the pipelinw
+// the message is passed across all the agents in the pipelin
 
 // Testing
 let agent1 = pipelineAgent (sprintf "Pipeline 1 processing message : %s")
@@ -52,9 +57,9 @@ let agent2 = pipelineAgent (sprintf "Pipeline 2 processing message : %s")
 
 let message i = sprintf "Message %d sent to the pipeline" i
 
-// TIP: Remember the async bind operator?
+// TIP: Remeber the async bind operator?
 //      the signature of the Async.bind operator fits quite well,
-//      because the return type of the "pipelineAgent" function is an Async<_>
+//      becase the return type of the "pipelineAgent" function is an Async<_>
 // TIP: It is useful to use an infix operator to simplify the composition between Agents
 // BONUS: after have composed the agents, try to use (and implement) the Kliesli operator
 
@@ -70,7 +75,7 @@ let pipeline x = agentRetn x >>= agent1 >>= agent2
 
 for i in [1..10] do
     pipeline (string i)
-    |> AsyncEx.run (fun res -> printfn $"Thread #id: %d{Thread.CurrentThread.ManagedThreadId} - Msg: %s{res}")
+    |> AsyncEx.run (fun res -> printfn "Thread #id: %d - Msg: %s" Thread.CurrentThread.ManagedThreadId res)
 
 module PipelineKliesli =
     let (>=>) f1 f2 x = f1 x >>= f2

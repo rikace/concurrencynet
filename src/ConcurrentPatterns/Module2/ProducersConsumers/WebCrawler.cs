@@ -74,11 +74,23 @@ namespace Dataflow.WebCrawler
             // item safely
 
             // Use the Memoize function to check if a web page has been already visited
+
+            while (pending.TryTake(out var url))
+            {
+                var content = await DownloadDocument(url);
+                var tilte = GetTitle(content);
+                Console.WriteLine($"The title of {url} is {tilte}");
+
+                foreach (var link in ExtractLinks(content))
+                {
+                    pending.Add(link);
+                }
+            }
         }
 
         // --------------------------------------------------------------
         // Start 100 web-crawlers concurrent using only small number of threads
-        public static async Task Run()
+        static void Run()
         {
             pending.Add("https://www.cnn.com");
             pending.Add("https://www.foxnews.com");
@@ -87,7 +99,7 @@ namespace Dataflow.WebCrawler
 
             // TODO how can I lunch 10 concurrent Crawler?
             for (int i = 0; i < 10; i++)
-                await Crawler();
+                Crawler();
         }
     }
 }

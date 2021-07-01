@@ -7,7 +7,7 @@ using System.Threading;
 namespace Helpers
 {
     // Atom object to perform CAS instruction
-    public class Atom<T> where T : class
+    public class Atom<T> where T : class //#A
     {
         public Atom(T value)
         {
@@ -16,9 +16,9 @@ namespace Helpers
 
         protected volatile T value;
 
-        public T Value => value;
+        public T Value => value; //#B
 
-        public virtual T Swap(Func<T, T> operation)
+        public virtual T Swap(Func<T, T> operation) //#C
         {
             T original, temp;
             do
@@ -27,7 +27,7 @@ namespace Helpers
                 temp = operation(original);
             }
 #pragma warning disable 420
-            while (Interlocked.CompareExchange(ref value, temp, original) != original);
+            while (Interlocked.CompareExchange(ref value, temp, original) != original); //#D
 #pragma warning restore 420
             return original;
         }
@@ -39,22 +39,24 @@ namespace Helpers
 
         public override T Swap(Func<T, T> operation)
         {
-            var currentValue = value;
-            var temp = operation(currentValue);
+            var original = value;
+            var temp = operation(original);
 #pragma warning disable 420
-            var result = Interlocked.CompareExchange(ref value, temp, currentValue);
-            if (ReferenceEquals(result, currentValue))
-                return result;
-            var spinner = new SpinWait();
-
+            if (Interlocked.CompareExchange(ref value, temp, original) != original)
 #pragma warning restore 420
-            while (!ReferenceEquals(result = Interlocked.CompareExchange(ref value, temp, currentValue), currentValue))
             {
-                spinner.SpinOnce();
-                currentValue = value;
-                temp = operation(currentValue);
+                var spinner = new SpinWait();
+                do
+                {
+                    spinner.SpinOnce();
+                    original = value;
+                    temp = operation(original);
+                }
+#pragma warning disable 420
+                while (Interlocked.CompareExchange(ref value, temp, original) != original);
+#pragma warning restore 420
             }
-            return result;
+            return original;
         }
     }
 

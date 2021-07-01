@@ -7,7 +7,12 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using CommonHelpers;
+using Dataflow.FuzzyMatch;
+using Dataflow.WebCrawler;
+using DataflowPipeline;
+using DataFlowPipeline.Compression;
 using ParallelForkJoin;
+using ReactiveAgent;
 using static Helpers.Helpers;
 using FileEx = Helpers.FileEx;
 
@@ -17,25 +22,42 @@ namespace DataFlowPipeline
     {
         static async Task Main(string[] args)
         {
-            var files = Directory.GetFiles("./../../../../Data/Text", "*.txt");
-
             var cts = new CancellationTokenSource();
 
-            // TODO
-            // complete the "DataFlowCrawler" implementation
-            await RunWebCrawler();
+            var files = Directory.GetFiles("../../../../../Data/Text", "*.txt");
 
-            // DEMO
-            // await ExecuteCompression.Start();
-            // WordsCounterDataflow.Start(cts.Token);
-            // await RunFuzzyMatch(files);
-            // await TestForkJoin(files);
-
-            Console.WriteLine("Finished. Press any key to exit.");
-            Console.ReadLine();
+            await TestForkJoin(files);
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
+
+            // WordsCounterDataflow.Start(cts.Token);
+
+            // DemoBlocks();
+
+            // await RunWebCrawler();
+            //
+            // await ExecuteCompression.Start();
+            //
+            //await RunFuzzyMatch(files);
+            //
+            // Console.WriteLine("Finished. Press any key to exit.");
+            // Console.ReadLine();
+        }
+
+        static void DemoBlocks()
+        {
+            DataflowTransformActionBlocks.Run();
+            // DemoBuildingBlocks.BufferBlock_Simple();
+            // DemoBuildingBlocks.BufferBlock_BoundCapacity();
+            // DemoBuildingBlocks.ActionBlock_Simple();
+            // DemoBuildingBlocks.ActionBlock_Parallel();
+            // DemoBuildingBlocks.ActionBlock_Linking();
+            // DemoBuildingBlocks.ActionBlock_Propagate();
+            // DemoBuildingBlocks.TransformBlock_Simple();
+            // DemoBuildingBlocks.BatchBlock_Simple();
+            // DemoBuildingBlocks.TransformManyBlock_Simple();
+            // DemoBuildingBlocks.BroadcastBlock_Simple();
         }
 
         static async Task RunWebCrawler()
@@ -52,7 +74,7 @@ namespace DataFlowPipeline
 
             string baseFolderName = @"./Images";
 
-            DataflowReactive.DataFlowCrawler.Start(urls, async (url, buffer) =>
+            DataFlowImageCrawler.Start(urls, 2, async (url, buffer) =>
             {
                 string fileName = Path.GetFileNameWithoutExtension(Path.GetTempFileName()) + ".jpg";
 
@@ -72,9 +94,23 @@ namespace DataFlowPipeline
             Console.ReadKey();
         }
 
-        static Task TestForkJoin(IEnumerable<string> files)
+        static async Task RunFuzzyMatch(IEnumerable<string> files)
         {
-            var result = ForkJoinDataFlow.ForkJoin<string, string, ConcurrentDictionary<string, int>>(files,
+            IList<string> filesOrdered =
+                files.Select(file => new FileInfo(file))
+                    .OrderBy(f => f.Length)
+                    .Select(f => f.FullName)
+                    .Take(10).ToList();
+
+            var wordsToSearch = new string[]
+                {"ENGLISH", "RICHARD", "STEALLING", "MAGIC", "STARS", "MOON", "CASTLE"};
+            await ParallelFuzzyMatch.RunFuzzyMatchDataFlow(wordsToSearch, filesOrdered);
+        }
+
+        static async Task TestForkJoin(IEnumerable<string> files)
+        {
+            var result = await ForkJoinDataFlow.ForkJoin<string, string, ConcurrentDictionary<string, int>>(
+                files,
                 file => FileEx.ReadAllLinesAsync(file),
                 () => new ConcurrentDictionary<string, int>(),
                 (state, line) =>
@@ -89,7 +125,13 @@ namespace DataFlowPipeline
 
                     return state;
                 });
-            return result;
+
+            foreach (var item in result)
+            {
+                Console.WriteLine($"The word {item.Key} was mentioned {item.Value}");
+            }
+
+
         }
     }
 }

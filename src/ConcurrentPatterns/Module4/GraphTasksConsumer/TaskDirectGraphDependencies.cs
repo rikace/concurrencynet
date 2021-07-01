@@ -29,7 +29,10 @@ namespace GraphTasksConsumer
     public interface ITaskDirectGraphDependencies
     {
         void AddOperation(int id, Action operation, params int[] dependencies);
-        event EventHandler<OperationCompletedEventArgs> OperationCompleted;
+
+        event EventHandler<OperationCompletedEventArgs>
+            OperationCompleted;
+
         void Execute();
     }
 
@@ -204,6 +207,91 @@ namespace GraphTasksConsumer
             var handler = OperationCompleted;
             handler?.Invoke(this, new OperationCompletedEventArgs(
                 data.Id, data.Start, data.End));
+        }
+
+
+        // TODO : remove
+        private void VerifyThatAllOperationsHaveBeenRegistered()
+        {
+            foreach (var op in _operations.Values)
+            {
+                foreach (var dependency in op.Dependencies)
+                {
+                    if (!_operations.ContainsKey(dependency))
+                    {
+                        throw new InvalidOperationException(
+                            "Missing operation: " + dependency);
+                    }
+                }
+            }
+        }
+
+        // TODO : how/where to use it
+        private void VerifyThereAreNoCycles()
+        {
+            if (CreateTopologicalSort() == null)
+                throw new InvalidOperationException("Cycle detected");
+        }
+
+        private List<int> CreateTopologicalSort()
+        {
+            // Build up the dependencies graph
+            var dependenciesToFrom = new Dictionary<int, List<int>>();
+            var dependenciesFromTo = new Dictionary<int, List<int>>();
+            foreach (var op in _operations.Values)
+            {
+                // Note that op.Id depends on each of op.Dependencies
+                dependenciesToFrom.Add(op.Id, new List<int>(op.Dependencies));
+
+                // Note that each of op.Dependencies is relied on by op.Id
+                foreach (var depId in op.Dependencies)
+                {
+                    List<int> ids;
+                    if (!dependenciesFromTo.TryGetValue(depId, out ids))
+                    {
+                        ids = new List<int>();
+                        dependenciesFromTo.Add(depId, ids);
+                    }
+
+                    ids.Add(op.Id);
+                }
+            }
+
+            // Create the sorted list
+            var overallPartialOrderingIds = new List<int>(dependenciesToFrom.Count);
+            var thisIterationIds = new List<int>(dependenciesToFrom.Count);
+            while (dependenciesToFrom.Count > 0)
+            {
+                thisIterationIds.Clear();
+                foreach (var item in dependenciesToFrom)
+                {
+                    // If an item has zero input operations, remove it.
+                    if (item.Value.Count == 0)
+                    {
+                        thisIterationIds.Add(item.Key);
+
+                        // Remove all outbound edges
+                        List<int> depIds;
+                        if (dependenciesFromTo.TryGetValue(item.Key, out depIds))
+                        {
+                            foreach (var depId in depIds)
+                            {
+                                dependenciesToFrom[depId].Remove(item.Key);
+                            }
+                        }
+                    }
+                }
+
+                // If nothing was found to remove, there's no valid sort.
+                if (thisIterationIds.Count == 0) return null;
+
+                // Remove the found items from the dictionary and
+                // add them to the overall ordering
+                foreach (var id in thisIterationIds) dependenciesToFrom.Remove(id);
+                overallPartialOrderingIds.AddRange(thisIterationIds);
+            }
+
+            return overallPartialOrderingIds;
         }
     }
 }

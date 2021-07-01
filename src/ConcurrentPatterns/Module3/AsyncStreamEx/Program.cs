@@ -49,22 +49,20 @@ namespace AsyncStreamEx
         }
 
         // TODO convert this as demo to IAsyncEnumerable
-        static async Task<IEnumerable<int>> SumFromOneToCountTaskIEnumerable(int count)
+        static async IAsyncEnumerable<int> SumFromOneToCountTaskIEnumerable(int count)
         {
             ConsoleExt.WriteLine("SumFromOneToCountAsyncIEnumerable called!");
-
-            var collection = new Collection<int>();
-            var result = await Task.Run(() =>
+            yield return await Task.Run(() =>
             {
                 var sum = 1;
                 for (var i = 0; i < count; i++)
                 {
                     sum = sum + i;
-                    collection.Add(sum);
+
                 }
-                return collection;
+
+                return sum;
             });
-            return result;
         }
 
         static IEnumerable<int> ProduceAsyncSumSequence(int count)
@@ -94,24 +92,24 @@ namespace AsyncStreamEx
         static async Task Main(string[] args)
         {
             // TODO / STEP 1
-            IAsyncEnumerable<int> pullBasedAsyncSequence = ProduceAsyncSumSequence(5).ToAsyncEnumerable();
-            var consumingTask = Task.Run(() => ConsumeAsyncSumSequence(pullBasedAsyncSequence));
-
-            // Just for demo! Wait until the task is finished!
-            consumingTask.Wait();
-
-            ConsoleExt.WriteLineAsync("Async Streams Demo Done!");
-            Console.ReadLine();
+            // IAsyncEnumerable<int> pullBasedAsyncSequence = ProduceAsyncSumSequence(5).ToAsyncEnumerable();
+            // var consumingTask = Task.Run(() => ConsumeAsyncSumSequence(pullBasedAsyncSequence));
+            //
+            // // Just for demo! Wait until the task is finished!
+            // consumingTask.Wait();
+            //
+            // ConsoleExt.WriteLineAsync("Async Streams Demo Done!");
+            // Console.ReadLine();
 
 
             // TODO / STEP 2
             // uncomment and fix the code
-            // IAsyncEnumerable<int> seq = SumFromOneToCountTaskIEnumerable(5);
+            IAsyncEnumerable<int> seq = SumFromOneToCountTaskIEnumerable(5);
 
-            // await foreach (var item in seq)
-            // {
-            //     Console.WriteLine($"Value {item} - Thread ID# {Thread.CurrentThread.ManagedThreadId}");
-            // }
+            await foreach (var item in seq)
+            {
+                Console.WriteLine($"Value {item} - Thread ID# {Thread.CurrentThread.ManagedThreadId}");
+            }
 
             Console.WriteLine("Complete");
             Console.ReadLine();

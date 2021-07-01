@@ -1,9 +1,17 @@
-﻿namespace DataParallelism.MapReduce
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DataParallelism.Reduce;
+
+namespace DataParallelism.MapReduce
 {
+    using Helpers;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System;
-    using System.Linq;
-    using DataParallelism.Reduce;
+    using System.Collections.Immutable;
+    using System.Threading;
 
     // TODO : Implement a Map-Reduce Function (as extension method - reusable)
     public static class ParallelMapReduce
@@ -19,7 +27,35 @@
             Func<TSource, IEnumerable<TMapped>> map,
             Func<TMapped, TKey> keySelector,
             Func<IGrouping<TKey, TMapped>, TResult> reduce)
-            => default; // source.AsParallel()
+            => source.AsParallel()
+                .WithDegreeOfParallelism(Environment.ProcessorCount)
+                .SelectMany(map)
+                .GroupBy(keySelector)
+                .Reduce(reduce)
+                .ToArray();
+
+        // public static TResult[] MapReduce<TSource, TMapped, TKey, TResult>(
+        //     this IEnumerable<TSource> source,
+        //     Func<TSource, IEnumerable<TMapped>> map,
+        //     Func<TMapped, TKey> keySelector,
+        //     Func<IGrouping<TKey, TMapped>, IEnumerable<TResult>> reduce,
+        //     int M, int R)
+        //     => source.AsParallel()
+        //         .WithDegreeOfParallelism(M)
+        //         .SelectMany(map)
+        //         .GroupBy(keySelector)
+        //         .ToList().AsParallel()
+        //         .WithDegreeOfParallelism(R)
+        //         .SelectMany(reduce)
+        //         .ToArray();
+        //
+        // public static ParallelQuery<TResult> MapReduce<TSource, TMapped, TKey, TResult>(
+        //     this IEnumerable<TSource> source,
+        //     Func<TSource, IEnumerable<TMapped>> map,
+        //     Func<TMapped, TKey> keySelector,
+        //     Func<IGrouping<TKey, TMapped>,
+        //         IEnumerable<TResult>> reduce)
+        //     => source.AsParallel().SelectMany(map).GroupBy(keySelector).SelectMany(reduce);
 
         public static TResult[] MapReduce<TSource, TMapped, TKey, TResult>(
             this IEnumerable<TSource> source,

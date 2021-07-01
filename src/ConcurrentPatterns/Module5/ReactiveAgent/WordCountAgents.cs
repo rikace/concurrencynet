@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using static System.Console;
 using CommonHelpers;
+using ReactiveAgent.Agents.Dataflow;
 
 namespace ReactiveAgent.Agents
 {
@@ -14,50 +16,53 @@ namespace ReactiveAgent.Agents
     // rewrite the example composing the Agent as pipeline
     public static class WordCountAgentsExample
     {
-        static IAgent<string> printer = Agent.Start((string msg) =>
-            WriteLine($"{msg} on thread {Thread.CurrentThread.ManagedThreadId}"));
-
-        //   Producer/consumer using TPL Dataflow
-        static IAgent<string> reader =
-            Agent.Start(async (string filePath) =>
-            {
-                await printer.Send("reader received message");
-                var lines = await File.ReadAllLinesAsync(filePath);
-                lines.ForAll(async line => await parser.Send(line));
-            });
-
-        static char[] punctuation = Enumerable.Range(0, 256).Select(c => (char)c).Where(c => Char.IsWhiteSpace(c) || Char.IsPunctuation(c)).ToArray();
-
-        static IAgent<string> parser =
-            Agent.Start(async (string line) =>
-            {
-                await printer.Send("parser received message");
-                line.Split(punctuation).ForAll(async word =>
-                    await counter.Send(word.ToUpper()));
-            });
-
-        // TODO
-        // Add a property that exposes an IObservable<'R> to the IAgent interface
-        // The implementation of this property should stream the result of the Agent
-        // Then, implement similar logic of the "counter" Agent using the Observable exposed
-        static IReplyAgent<string, (string, int)> counter =
-            Agent.Start(ImmutableDictionary<string, int>.Empty,
-                (ImmutableDictionary<string, int> state, string word) =>
-                {
-                    printer.Post("counter received message");
-                    int count;
-                    if (state.TryGetValue(word, out count))
-                        return state.Add(word, count++);
-                    else return state.Add(word, 1);
-                }, (state, word) => (state, (word, state[word])));
+        static char[] punctuation = Enumerable.Range(0, 256).Select(c => (char) c)
+            .Where(c => Char.IsWhiteSpace(c) || Char.IsPunctuation(c)).ToArray();
 
         public static async Task Run()
         {
+            IAgent<string> printer = Agent.Start((string msg) =>
+                WriteLine($"{msg} on thread {Thread.CurrentThread.ManagedThreadId}"));
+
+            // TODO
+            // Add a property that exposes an IObservable<'R> to the IAgent interface
+            // The implementation of this property should stream the result of the Agent
+            // Then, implement similar logic of the "counter" Agent using the Observable exposed
+            IReplyAgent<string, (string, int)> counter =
+                Agent.Start(new Dictionary<string, int>(),
+                    (Dictionary<string, int> state, string word) =>
+                    {
+                        printer.Post($"counter received for word {word} message");
+                        int count;
+                        if (state.TryGetValue(word, out count))
+                            state[word] = count + 1;
+                        else state.Add(word, 1);
+                        printer.Post($"counter {state[word]} received for word {word}");
+                        return state;
+                    }, (state, word) => (state, (word, state[word])));
+
+            var parser = new StatelessDataflowAgent<string>(async line =>
+                {
+                    await printer.Send("parser received message");
+                    line.Split(punctuation).ForAll(async word =>
+                        await counter.Send(word.ToUpper()));
+                });
+
+            //   Producer/consumer using TPL Dataflow
+            IAgent<string> reader =
+                new StatelessDataflowAgent<string>(async (string filePath) =>
+                {
+                    await printer.Send("reader received message");
+                    var lines = await File.ReadAllLinesAsync(filePath);
+                    lines.ForAll(async line => await parser.Send(line));
+                });
+
+
             const string contentPath = "../../../../../Data/Shakespeare";
             foreach (var filePath in Directory.EnumerateFiles(contentPath, "*.txt"))
             {
                 if (System.IO.File.Exists(filePath))
-                    reader.Post(filePath);
+                    await reader.Send(filePath);
             }
 
             Console.ReadLine();

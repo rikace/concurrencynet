@@ -1,10 +1,18 @@
 namespace DataFlowPipeline.Compression
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Net;
     using System.Threading.Tasks;
+    using CommonHelpers;
+    using Dataflow.FuzzyMatch;
+    using Dataflow.WebCrawler;
+    using DataFlowPipeline.Compression;
+    using ParallelForkJoin;
+    using static Helpers.Helpers;
     using FileEx = Helpers.FileEx;
 
     public class ExecuteCompression

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using System.IO;
 using ReactiveAgent.Agents.Dataflow;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks.Dataflow;
 using CommonHelpers;
 using ParallelPatterns;
-using TPLAgent;
 using static Helpers.Helpers;
 using File = Helpers.FileEx;
 
@@ -17,15 +17,23 @@ namespace ReactiveAgent.CS
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
 
-            // TODO
-            // PingPongAgents.Start();
-            // AgentAggregate.Run();
+            // DataflowPipeline.DataflowPipeline.Start();
 
             // DEMO
-            //  WordCountAgentsExample.Run().Wait();
+            //   DataflowTransformActionBlocks.Run();
+
+            // DEMO
+            // PingPongAgents.Start();
+
+            // DEMO
+            //   WordCountAgentsExample.Run().Wait();
+
+           await WordCountAgentsExample.Run();
+
+           // AgentAggregate.Run();
 
 
             Console.WriteLine("Finished. Press any key to exit.");

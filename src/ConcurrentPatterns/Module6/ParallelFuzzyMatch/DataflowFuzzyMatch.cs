@@ -59,19 +59,25 @@ using ReactiveAgent.Agents;
 
 
             // TODO (5)
-            // (1)  Implement a block name "printBlock", which prints the output of
-            //      the foundMatchesBlock using the "PrintSummary" method
-            //      Then link the block to the "foundMatchesBlock" block
-            //      var printBlock = // missing code
-            // (2)  Link the "printBlock" to the "foundMatchesBlock" block
+            // Implement a block name "printBlock", which prints the output of
+            // the foundMatchesBlock using the "PrintSummary" method
+            // Then link the block to the "foundMatchesBlock" block
+            // var printBlock = // missing code
+            var printBlock =
+                new ActionBlock<WordDistanceStruct[]>(
+                    r => PrintSummary(r.AsSet()),
+                    new ExecutionDataflowBlockOptions {SingleProducerConstrained = true});
+
+            var linkOptions = new DataflowLinkOptions {PropagateCompletion = true};
+
+
 
             // TODO (6)
             // After have completed TODO (5), remove or unlink the printBlock, and replace the output of the "foundMatchesBlock" block
             // with Reactive Extensions "AsObservable", maintaining the call to the "PrintSummary" method
             // Play with different RX high-order function constructors
-            // TODO foundMatchesBlock ...
 
-            var linkOptions = new DataflowLinkOptions {PropagateCompletion = true};
+            foundMatchesBlock.AsObservable().Subscribe(summaryMathces => PrintSummary(summaryMathces.AsSet()));
 
             IDisposable disposeAll = new CompositeDisposable(
                 inputBlock.LinkTo(readLinesBlock, linkOptions),
@@ -169,8 +175,9 @@ using ReactiveAgent.Agents;
             foreach (var file in files)
                 await inputBlock.SendAsync(file, cts.Token);
 
-            inputBlock.Complete();
-            await foundMatchesBlock.Completion.ContinueWith(_ =>  disposeAll.Dispose());
+            //  inputBlock.Complete();
+            //  await foundMatchesBlock.Completion.ContinueWith(_ =>
+            //      disposeAll.Dispose());
         }
     }
 }

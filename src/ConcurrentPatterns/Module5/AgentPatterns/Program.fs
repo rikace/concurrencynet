@@ -20,7 +20,7 @@ let main argv =
 
     // TODO :
     //      ImagePipeline
-    //      Implement a bounded-pipeline using the Agent as asynchronous buffer
+    //      Implement a baunded-pipeline using the Agent as asynchronous buffer
     //      check the file "AsyncBoundedQueue.fs" for the underlying implementation
     //      open the file "ImagePipeline.fs" and complete the TODOs
     ImagePipeline.start()

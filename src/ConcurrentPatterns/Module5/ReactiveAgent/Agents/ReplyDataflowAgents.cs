@@ -10,6 +10,8 @@ using static ParallelPatterns.Common.OptionHelpers;
 
 namespace ReactiveAgent.Agents.Dataflow
 {
+    //   Producer/consumer using TPL Dataflow
+
     public class StatefulReplyDataflowAgent<TState, TMessage, TReply> :
         IReplyAgent<TMessage, TReply>
     {
@@ -25,8 +27,7 @@ namespace ReactiveAgent.Agents.Dataflow
             return tcs.Task;
         }
 
-        public Task Send(TMessage message) =>
-            actionBlock.SendAsync((message, None));
+        public Task Send(TMessage message) => actionBlock.SendAsync((message, None));
 
         public void Post(TMessage message) =>
             actionBlock.Post((message, None));
@@ -42,11 +43,20 @@ namespace ReactiveAgent.Agents.Dataflow
                 CancellationToken = cts != null ? cts.Token : CancellationToken.None
             };
 
-            // TODO
-            // Add code implementation here.
-            // for the Reply back implementation we could return
-            // a "TaskCompletionSource" that set the Result when the underlying Task completes
+            actionBlock = new ActionBlock<(TMessage, Option<TaskCompletionSource<TReply>>)>(
+                async message =>
+                {
+                    (TMessage msg, Option<TaskCompletionSource<TReply>> replyOpt) = message;
 
+                    await replyOpt.Match(
+                        none: async () => state = await projection(state, msg),
+                        some: async reply =>
+                        {
+                            (TState newState, TReply replyresult) = await ask(state, msg);
+                            state = newState;
+                            reply.SetResult(replyresult);
+                        });
+                });
         }
 
         public StatefulReplyDataflowAgent(TState initialState,
@@ -59,11 +69,19 @@ namespace ReactiveAgent.Agents.Dataflow
             {
                 CancellationToken = cts != null ? cts.Token : CancellationToken.None
             };
-
-            // TODO
-            // Add code implementation here.
-            // for the Reply back implementation we could return
-            // a "Tas
+            actionBlock = new ActionBlock<(TMessage, Option<TaskCompletionSource<TReply>>)>(
+                message =>
+                {
+                    (TMessage msg, Option<TaskCompletionSource<TReply>> replyOpt) = message;
+                    replyOpt.Match(none: () => (state = projection(state, msg)),
+                        some: reply =>
+                        {
+                            (TState newState, TReply replyresult) = ask(state, msg);
+                            state = newState;
+                            reply.SetResult(replyresult);
+                            return state;
+                        });
+                });
         }
     }
 }

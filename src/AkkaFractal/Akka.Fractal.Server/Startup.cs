@@ -62,7 +62,13 @@ namespace Akka.Fractal.Server
                 // HOCON config (akka.conf) file section "remoteactor"
                 //
                 //  Following code has to be update with the correct implementation
-                var tileRenderActor = Nobody.Instance;
+                var tileRenderActor = actorSystem.ActorOf(Props.Create<TileRenderActor>()
+                        .WithDeploy(
+                            Deploy.None.WithScope(
+                                new RemoteScope(Address.Parse("akka.tcp://RemoteSystem@0.0.0.0:8090")))),
+                    "remoteactor");
+
+
 
                 // TODO
                 // Same as previous TODO
@@ -70,11 +76,10 @@ namespace Akka.Fractal.Server
                 // passing the correct argument in the constructor
                 //
                 //  Following code has to be update with the correct implementation
-                var sseTileActor = Nobody.Instance;
+                var sseTileActor =
 
-
-                actorSystem.ActorOf(Props.Create(() => new SseTileActor(serverSentEventsService, tileRenderActor)),
-                    "sse-tile");
+                    actorSystem.ActorOf(Props.Create(() => new SseTileActor(serverSentEventsService, tileRenderActor)),
+                        "sse-tile");
 
                 return () => sseTileActor;
             });

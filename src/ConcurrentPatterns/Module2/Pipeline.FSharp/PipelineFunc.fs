@@ -36,8 +36,9 @@ module PipelineFunc =
 
         // TODO (3.b)
         let enqueue (input:'a) (callback:Func<('a * 'b), unit>) =
-            // TODO complete missing code
+            // missing code
             ()
+            BlockingCollection<Continuation<_,_>>.AddToAny(continuations, Continuation(input, callback))
 
         let stop() = for continuation in continuations do continuation.CompleteAdding()
 
@@ -53,12 +54,13 @@ module PipelineFunc =
                     // step to implement
                         // 1 - take an item from the continuations collection
                         // 2 - process the "continuation" function
-                        //     Keep in mind that the continuation function has both the
+                        //     Keep in mind that the continutaion function has both the
                         //     value and the callback
 
-
-
-                    () // TODO replace code implementation
+                    let continuation = ref Unchecked.defaultof<Continuation<_,_>>
+                    BlockingCollection.TakeFromAny(continuations, continuation) |> ignore
+                    let continuation = continuation.Value
+                    continuation.Callback.Invoke(continuation.Input, func.Invoke(continuation.Input))
 
                 ,cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default) |> ignore
 

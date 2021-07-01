@@ -34,11 +34,11 @@ namespace ReactiveAgent.Agents
     {
         public static IAgentRx<TMessage, TResult> StartWithRx<TMessage, TResult>(TResult initialState,
             Func<TResult, TMessage, TResult> action, CancellationTokenSource cts = null)
-            => default; // new StatefulDataflowAgentWithRx<TMessage, TResult>(initialState, action, cts);
+            => new StatefulDataflowAgentWithRx<TMessage, TResult>(initialState, action, cts);
 
         public static IAgentRx<TMessage, TResult> StartWithRx<TMessage, TResult>(TResult initialState,
             Func<TResult, TMessage, Task<TResult>> action, CancellationTokenSource cts = null)
-            => default; // new StatefulDataflowAgentWithRx<TMessage, TResult>(initialState, action, cts);
+            => new StatefulDataflowAgentWithRx<TMessage, TResult>(initialState, action, cts);
 
         public static IAgent<TMessage> Start<TMessage>(Action<TMessage> action, CancellationTokenSource cts = null)
             => new StatelessDataflowAgent<TMessage>(action, cts);
@@ -58,16 +58,17 @@ namespace ReactiveAgent.Agents
         public static IReplyAgent<TMessage, TReply> Start<TState, TMessage, TReply>(TState initialState,
             Func<TState, TMessage, Task<TState>> projection, Func<TState, TMessage, Task<(TState, TReply)>> ask,
             CancellationTokenSource cts = null)
-            => default; // new StatefulReplyDataflowAgent<TState, TMessage, TReply>(initialState, projection, ask, cts);
+            => new StatefulReplyDataflowAgent<TState, TMessage, TReply>(initialState, projection, ask, cts);
 
         public static IReplyAgent<TMessage, TReply> Start<TState, TMessage, TReply>(TState initialState,
             Func<TState, TMessage, TState> projection, Func<TState, TMessage, (TState, TReply)> ask,
             CancellationTokenSource cts = null)
-            => default; // new StatefulReplyDataflowAgent<TState, TMessage, TReply>(initialState, projection, ask, cts);
+            => new StatefulReplyDataflowAgent<TState, TMessage, TReply>(initialState, projection, ask, cts);
 
         public static IReplyAgent<TMessage, TReply> Start<TMessage, TReply>(Func<TMessage, TReply> ask,
             CancellationTokenSource cts = null)
-            => default; //  new StatefulReplyDataflowAgent<int, TMessage, TReply>(0, (cnt, msg) => cnt + 1, (cnt, msg) => (cnt + 1, ask(msg)), cts);
+            => new StatefulReplyDataflowAgent<int, TMessage, TReply>(0, (cnt, msg) => cnt + 1,
+                (cnt, msg) => (cnt + 1, ask(msg)), cts);
 
         public static IDisposable LinkTo<TOutput, TState>(this ISourceBlock<TOutput> source,
             IAgentRx<TOutput, TState> agent)

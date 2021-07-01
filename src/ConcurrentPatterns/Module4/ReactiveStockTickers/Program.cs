@@ -8,7 +8,6 @@ namespace RxConcurrentStockTickers
         {
             ObservableDataStreams.RxStream();
 
-            Console.WriteLine("Press Enter to EXIT");
             Console.ReadLine();
         }
     }

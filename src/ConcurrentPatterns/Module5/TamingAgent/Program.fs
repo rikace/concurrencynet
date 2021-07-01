@@ -82,7 +82,7 @@ let main argv =
 
     ``TamingAgent example``.transformImages()
 
-    // ``Composing TamingAgent with Kleisli operator example``.transformImages();
+    ``Composing TamingAgent with Kleisli operator example``.transformImages();
 
     Console.ReadLine() |> ignore
     0

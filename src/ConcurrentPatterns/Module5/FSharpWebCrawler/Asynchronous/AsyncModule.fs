@@ -1,5 +1,6 @@
 module FSharpWebCrawler.Asynchronous.AsyncModule
 
+
 open System
 open System.Net
 open System.IO
@@ -22,7 +23,7 @@ let isAllowedInFileName c =
 let downloadAsync url =
     async {
         use client = new WebClient()
-        printfn $"Downloading %s{url} ..."
+        printfn "Downloading %s ..." url
         let! data = client.DownloadStringTaskAsync(Uri(url)) |> Async.AwaitTask
         return (url, data)
     }
@@ -49,12 +50,17 @@ xs
 |> Async.RunSynchronously
 |> Seq.iter(fun (u: string,d: string) -> printfn "Downloaded %s - size %d" u d.Length)
 
+
+
 // Step (1)
 // How can you handle the exception in case of not existing URL?
 // TIP:    avoid the try-catch block and check if there is an existing
 //         Async api that could help you
 //         In addition, you should still be able to branch logic in both the
 //         "success" and "failure" paths using the F# Result<_,_> type
+
+
+
 xs
 |> List.map(fun u -> AsyncRes.wrap (downloadAsync u.Url))
 |> Async.Parallel
@@ -71,6 +77,7 @@ xs
 
 // TIP : define and use a new type that combines the Async and Result types,
 //       this type definition will be very useful in composition of the voming function
+
 
 type AsyncRes<'a> = Async<Result<'a, exn>>
 
@@ -94,7 +101,7 @@ xs
 let downloadAsync' url =
     AsyncRes.wrap (async {
         use client = new WebClient()
-        printfn $"Downloading %s{url} ..."
+        printfn "Downloading %s ..." url
         let! data = client.DownloadStringTaskAsync(Uri(url)) |> Async.AwaitTask
         return (url, data)
     })
@@ -108,7 +115,7 @@ let saveAsync' (url : string, data : string) =
                 destination |> Seq.filter isAllowedInFileName |> String.Concat
             |]
             |> Path.Combine
-        printfn $"saving %s{Path.GetFileName destination} ..."
+        printfn "saving %s ..." (Path.GetFileName destination)
         use stream = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.ReadWrite, 0x100)
         use writer = new StreamWriter(stream)
         do! writer.WriteAsync(data) |> Async.AwaitTask
@@ -144,9 +151,9 @@ xs
 // now that we have implemented the Bind function, let's implement a computation expression
 // https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/computation-expressions
 //
-// complete the Bind functions respecting the function signature.
+// complete the Bind functions respecting the function siganuture.
 // in this case, it is important to define two Bind functions, as indicated below
-// NOTE: you should be able to use any implementation of the "download" & "save" function
+// NOTE: you should be able to use any implementaion of the "download" & "save" function
 //       (the wrapped and no wrapped version)
 
 type AsyncResComputationExpression() =
@@ -166,7 +173,7 @@ type AsyncResComputationExpression() =
     member this.Zero() : AsyncRes<unit> = this.Return()
 
 // Step (5)
-// uncomment the following code to verify that the CE works correctly
+// uncompent the following code to verify that the CE works corretcly
 let asyncRes = AsyncResComputationExpression()
 
 let comp url = asyncRes {

@@ -60,7 +60,7 @@ type Pipeline<'a, 'b> private (func:Func<'a, 'b> option, funcTask:Func<'a, Task<
 
     // TODO (3.b)
     let enqueue (input:'a) (callback:Func<('a * 'b), unit>) =
-        // TODO complete missing code
+        // missing code
         ()
 
     let stop() = for continuation in continuations do continuation.CompleteAdding()
@@ -72,14 +72,14 @@ type Pipeline<'a, 'b> private (func:Func<'a, 'b> option, funcTask:Func<'a, Task<
         for i = 0 to blockingCollectionPoolSize - 1 do
             Task.Factory.StartNew(fun ( )->
                 while (not <| continuations.All(fun bc -> bc.IsCompleted)) && (not <| cancellationToken.IsCancellationRequested) do
-
+                        
                     // TODO (3.c)
-                    // step to implement
-                        // 1 - take an item from the continuations collection
+                    // step to implement 
+                        // 1 - take an item from the continuations collection 
                         // 2 - process the "continuation" function
-                        //     Keep in mind that the continuation function has both the
-                        //     value and the callback
-
+                        //     Keep in mind that the continutaion function has both the
+                        //     value and the callback 
+                      
                     // let continuation = ref Unchecked.defaultof<Continuation<_,_>>
                     ()
             , cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default) |> ignore

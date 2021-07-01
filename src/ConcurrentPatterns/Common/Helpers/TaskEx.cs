@@ -7,7 +7,6 @@ using FunctionalHelpers;
 
 namespace ParallelPatterns.TaskComposition
 {
-    // TODO Review
     public static partial class TaskEx
     {
         public static Task<R[]> Traverse<T, R>(this IEnumerable<T> collection, Func<T, Task<R>> projection)
@@ -15,6 +14,17 @@ namespace ParallelPatterns.TaskComposition
 
         public static Task<R[]> Traverse<T, R>(this IEnumerable<T> collection, Func<T, R> projection)
             => Task.FromResult(collection.Select(projection).ToArray());
+
+        // TODO RT
+        // public static Task<IEnumerable<T>> Traverse<T>(this IEnumerable<Task<T>> sequence)
+        // {
+        //     return sequence.Aggregate(
+        //         Task.FromResult(Enumerable.Empty<T>()),
+        //         (eventualAccumulator, eventualItem) =>
+        //             from accumulator in eventualAccumulator
+        //             from item in eventualItem
+        //             select accumulator.Concat(new[] { item }).ToArray().AsEnumerable());
+        // }
 
         public static async Task<R> Apply<T, R>(this Task<Func<T, R>> f, Task<T> arg)
            => (await f.ConfigureAwait(false))(await arg.ConfigureAwait(false));

@@ -42,6 +42,13 @@ namespace Reactive
             // Suggestion, the trick is to send to the observer a message
             // that contains this instance of PING
             return null;
+
+            /* Solutions
+			 return Observable.Interval(TimeSpan.FromSeconds(2))
+                .Where(n => n < 10)
+                .Select(n => this)
+                .Subscribe(observer);
+			*/
         }
         // Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         public void Dispose()
@@ -82,6 +89,12 @@ namespace Reactive
             // Suggestion, the trick is to send to the observer a message
             // that contains this instance of PONG
             return null;
+			/* Solutions
+            return Observable.Interval(TimeSpan.FromSeconds(1.5))
+                .Where(n => n < 10)
+                .Select(n => this)
+                .Subscribe(observer);
+		 */
         }
 
         // Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

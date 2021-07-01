@@ -30,6 +30,7 @@ let loadImage imageName destination = async {
 let scaleImage (info:ImageInfo) = async {
     let scale = 200
     let image = info.Image.Clone()
+    let image' = info.Image
     info.Image.Dispose()
     info.Image <- null
     let mutable resizedImage = ImageHandlers.resize scale scale image
@@ -73,7 +74,10 @@ let filterImages = async {
  //     look how the previous functions "filterImages" and "scaleImages" are implemented
 let saveImages = async {
     while not cts.IsCancellationRequested do
-        () // replace this () unit with the missing implementation
+        let! info = filteredImages.AsyncDequeue()
+        printfn "saving %s"  info.Name
+        info.Image.Save(info.Destination)
+        info.Image.Dispose()
 }
 
  // TODO :
@@ -81,4 +85,8 @@ let saveImages = async {
  //     run all the steps previously implemented
  //     loadImages, scaleImages, filterImages, saveImages
 
-let start() = ()
+let start() =
+    Async.Start(loadImages, cts.Token)
+    Async.Start(scaleImages, cts.Token)
+    Async.Start(filterImages, cts.Token)
+    Async.Start(saveImages, cts.Token)

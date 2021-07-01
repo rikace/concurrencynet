@@ -37,3 +37,19 @@ module Helpers =
     let linkPat = "href=\s*\"[^\"h]*(http://[^&\"]*)\""
     let getLinks (txt:string) =
         [ for m in Regex.Matches(txt,linkPat)  -> m.Groups.Item(1).Value ]
+
+    // A type that helps limit the number of active web requests
+    type RequestGate(n:int) =
+        let semaphore = new Semaphore(initialCount=n,maximumCount=n)
+        member x.AsyncAcquire(?timeout) =
+            async {
+                let! ok = Async.AwaitWaitHandle(semaphore,
+                                                ?millisecondsTimeout=timeout)
+                if ok then
+                   return
+                     { new System.IDisposable with
+                         member x.Dispose() =
+                             semaphore.Release() |> ignore }
+                else
+                   return! failwith "couldn't acquire a semaphore"
+            }

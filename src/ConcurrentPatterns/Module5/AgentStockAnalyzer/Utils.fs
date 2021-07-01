@@ -6,11 +6,10 @@
 
     type private ThreadSafeRandomRequest =
     | GetDouble of AsyncReplyChannel<decimal>
-
-    let private threadSafeRandomAgent = Agent.Start(fun inbox ->
+    let private threadSafeRandomAgent = Agent.Start(fun inbox -> 
             let rnd = new Random()
             let rec loop() = async {
-                let! GetDouble(reply) = inbox.Receive()
+                let! GetDouble(reply) = inbox.Receive() 
                 reply.Reply((rnd.Next(-5, 5) |> decimal))
                 return! loop()
             }
@@ -28,7 +27,7 @@
         try
             Console.ForegroundColor <- color
             Console.WriteLine(msg)
-        finally
+        finally 
             Console.ForegroundColor <- temp
 
 
