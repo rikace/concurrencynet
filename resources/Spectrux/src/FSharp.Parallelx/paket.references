@@ -1,0 +1,13 @@
+FSharp.Core
+SourceLink.Create.CommandLine
+
+System.Reactive
+System.Reactive.Interfaces
+System.Reactive.Linq
+System.Threading.Tasks.Dataflow
+System.IO.Pipelines
+
+FSharp.Control.AsyncSeq
+FSharpx.Collections
+
+BenchmarkDotNet

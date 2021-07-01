@@ -1,0 +1,8 @@
+System.Reactive
+System.Reactive.Core
+System.Reactive.Linq
+System.IO.Pipelines
+System.Buffers 
+System.Memory 
+
+System.Threading.Tasks.Dataflow
