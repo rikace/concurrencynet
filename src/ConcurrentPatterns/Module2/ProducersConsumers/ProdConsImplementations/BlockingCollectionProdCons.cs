@@ -14,7 +14,7 @@ namespace ProducerConsumer
     // convert the Steps to be able to handle multi/producers and multi/consumers
     // without threads contention.
     // For example look into the "BlockingCollection<>.TryTakeFromAny" API
-    // See MultiThreadedProdCons
+    // Therefore we might need to convert each "Step*Data" collection into an array of BlockingCollection<_>
     public class BlockingCollectionProdCons
     {
         public BlockingCollection<string> inputData = null;

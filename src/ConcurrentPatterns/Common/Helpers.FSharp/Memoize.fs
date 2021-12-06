@@ -16,41 +16,37 @@ module Helpers =
                             let result = func x
                             table.[x] <- result
                             result
-        let memoize2 f =
-            let f = (fun (a,b) -> f a b) |> memoize
-            fun a b -> f (a,b)
 
-        let memoize3 f =
-            let f = (fun (a,b,c) -> f a b c) |> memoize
-            fun a b c -> f (a,b,c)
-            
+
+        // (1) Implement Thread-safe memoization function
+        // (2) Optionally, implement memoization with Lazy behavior
         let memoizeThreadSafe (func: 'a -> 'b) =
-            let table = ConcurrentDictionary<'a,'b>()
-            fun x ->   table.GetOrAdd(x, func)        
+            // Add missing code
+            Unchecked.defaultof<'a -> 'b>
 
 
         let memoizeWithEnviction cacheTimeSeconds (caller:string) (f: ('a -> 'b)) =
             let cacheTimes = ConcurrentDictionary<string,DateTime>()
-            let cache = ConcurrentDictionary<'a, 'b>()    
+            let cache = ConcurrentDictionary<'a, 'b>()
             fun x ->
                 match cacheTimes.TryGetValue caller with
                 | true, time when time < DateTime.UtcNow.AddSeconds(-cacheTimeSeconds)
                     -> cache.TryRemove(x) |> ignore
                 | _ -> ()
-                cache.GetOrAdd(x, fun x -> 
+                cache.GetOrAdd(x, fun x ->
                     cacheTimes.AddOrUpdate(caller, DateTime.UtcNow, fun _ _ ->DateTime.UtcNow)|> ignore
                     f(x)
                     )
-    
+
         let memoizeWithEnvictionAsync cacheTimeSeconds (caller:string) (f: ('a -> Async<'b>)) =
             let cacheTimes = ConcurrentDictionary<string,DateTime>()
-            let cache = ConcurrentDictionary<'a, System.Threading.Tasks.Task<'b>>()    
-            fun x -> 
+            let cache = ConcurrentDictionary<'a, System.Threading.Tasks.Task<'b>>()
+            fun x ->
                 match cacheTimes.TryGetValue caller with
                 | true, time when time < DateTime.UtcNow.AddSeconds(-cacheTimeSeconds)
                     -> cache.TryRemove(x) |> ignore
                 | _ -> ()
-                cache.GetOrAdd(x, fun x -> 
+                cache.GetOrAdd(x, fun x ->
                     cacheTimes.AddOrUpdate(caller, DateTime.UtcNow, fun _ _ ->DateTime.UtcNow)|> ignore
                     f(x) |> Async.StartAsTask
-                    ) |> Async.AwaitTask  
+                    ) |> Async.AwaitTask

@@ -7,7 +7,6 @@
     <ItemGroup>
         <Compile Include="AgentPipe.fs" />
         <Compile Include="Pipeline.fs" />
-        <Compile Include="PipelineFunc.fs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Parallelism
 {
-    class LockFreeStack<T>
+    public class LockFreeStack<T>
     {
         private class Node
         {
@@ -20,9 +20,10 @@ namespace Parallelism
 
         public int Count => count;
         public bool IsEmpty => count > 0;
+
         public void Push(T value)
         {
-            var newNode = new Node() { Value = value };
+            var newNode = new Node() {Value = value};
             while (true)
             {
                 newNode.Next = this.head;

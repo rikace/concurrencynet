@@ -15,7 +15,7 @@ let sites =
         "http://www.youtube.com";   "http://www.gmail.com";
         "http://www.reddit.com";    "http://www.twitter.com";   ]
 
-// TODO : 4.11
+// TODO LAB
 //  run in parallel
 //  Parallel Asynchronous computations
 let httpAsync (url : string) = async {
@@ -34,7 +34,7 @@ let runAsync () =
     |> Async.RunSynchronously
 
 
-// TODO :
+// TODO LAB
 //      create a function that throttles the async operations
 //      The RequestGate is a good approach (but not the only one)
 //      for example "let gate = RequestGate(2)"

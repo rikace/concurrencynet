@@ -31,6 +31,9 @@ namespace BenchmarkParallelPatterns
 
          [Benchmark]
          public double ParallelPiMonteCarlo() => PiMontecarlo.ParallelPiMonteCarlo(iterations);
+
+         [Benchmark]
+         public double PLINQPartitionerMonteCarlo() => PiMontecarlo.PLINQPartitionerCalculate(iterations);
     }
 
 
@@ -70,12 +73,10 @@ namespace BenchmarkParallelPatterns
             // to run from command line:
             // dotnet run -c RELEASE --project Benchmarking.csproj
 
-            //BenchmarkRunner.Run<BenchmarkQuickSort>();
-
-            // dotnet run -c RELEASE --project Benchmarking.csproj
-            BenchmarkRunner.Run<BenchmarkMonteCarlo>();
-
+            // BenchmarkRunner.Run<BenchmarkQuickSort>();
             // BenchmarkRunner.Run<StringsWithSpan>();
+
+            BenchmarkRunner.Run<BenchmarkMonteCarlo>();
         }
     }
 }

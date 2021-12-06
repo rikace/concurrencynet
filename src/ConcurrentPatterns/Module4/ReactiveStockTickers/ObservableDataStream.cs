@@ -28,7 +28,7 @@ namespace RxConcurrentStockTickers
                             var startData = new DateTime(2001, 1, 1);
                             return Observable
                                 .Interval(TimeSpan.FromMilliseconds(delay))
-                                // TODO
+                                // TODO LAB
                                 //        Combine the two streams into a single one that returns
                                 //        a Tuple type.
                                 //        Combine the output of the "Observable Interval" stream with the
@@ -39,7 +39,7 @@ namespace RxConcurrentStockTickers
                                 .Select(_ => default(StockData)); // <= remove this line (compilation purpose)
                         }
                     )
-                    // TODO :
+                    // TODO LAB
                     //      Merge the streams of StockData into a single one
                     //      Investigate if concurrency (Task Scheduler) is enable
                     //      otherwise enable the parallelism. In this case the "TaskPoolScheduler.Default" could help.
@@ -59,7 +59,7 @@ namespace RxConcurrentStockTickers
             {
                 stockFiles
                     .ObservableStreams(StockData.Parse)
-                    // TODO :
+                    // TODO LAB
                     //      try different debauncing operator to reduce
                     //      or tame back-pressure (Ex Buffer, Throttle...)
                     //...

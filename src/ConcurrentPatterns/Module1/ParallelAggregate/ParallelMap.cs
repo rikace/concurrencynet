@@ -14,16 +14,11 @@ namespace DataParallelism.Map
         public static IEnumerable<object> Map<TSource, TKey, TMapped>(this IList<TSource> source,
                 Func<TSource, IEnumerable<TMapped>> map, Func<TMapped, TKey> keySelector)
             // replace null with the implementation
-            => null;
+            => default;
 
         public static IEnumerable<IGrouping<TKey, TMapped>> Map2<TSource, TKey, TMapped>(this IList<TSource> source,
                 Func<TSource, IEnumerable<TMapped>> map, Func<TMapped, TKey> keySelector)
             // replace null with the implementation
-            => source.AsParallel()
-                .WithExecutionMode(ParallelExecutionMode.ForceParallelism)
-                .WithDegreeOfParallelism(Environment.ProcessorCount)
-                .SelectMany(map)
-                .GroupBy(keySelector)
-                .ToList();
+            => default; //source.AsParallel()
     }
 }

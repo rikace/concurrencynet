@@ -92,14 +92,14 @@ namespace DataFlowPipeline.Compression
                                     // with a network stream to send the data across the wire.
                                     await streamDestination.WriteAsync(msg.EncryptedDataSize.Bytes, 0,
                                         msg.EncryptedDataSize.Length);
-                                    await streamDestination.WriteAsync(msg.Data.Bytes, 0, msg.Data.Length);
-                                    lastIndexProc = msg.Sequence;
 
+                                    await streamDestination.WriteAsync(msg.Data.Bytes, 0, msg.Data.Length);
+
+                                    lastIndexProc = msg.Sequence;
                                     // the chunk of data that is processed is removed
                                     // from the local state, keeping track of the items to perform
                                     details.Remove(lastIndexProc);
                                 }
-
                                 return (details, lastIndexProc);
                             })
                             .SingleAsync().Wait())

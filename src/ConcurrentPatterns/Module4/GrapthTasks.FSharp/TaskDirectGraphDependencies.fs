@@ -1,6 +1,4 @@
 namespace DirectGraphDependencies
-
-
     open System
     open System.Collections.Generic
     open System.Threading
@@ -8,18 +6,18 @@ namespace DirectGraphDependencies
     open System.Threading.Tasks
 
     type MList<'a> = System.Collections.Generic.List<'a>
-       
+
     // DAG F# Agent to parallelize the execution of operations with dependencies
-    type TaskMessage =  
+    type TaskMessage =
         | AddTask of int * TaskInfo
         | QueueTask of TaskInfo
         | ExecuteTasks
-    (**F# The Type TaskInfo contains and keeps track of the details of the registered task, the id, 
+    (**F# The Type TaskInfo contains and keeps track of the details of the registered task, the id,
     function operation and dependency edges. The execution context is captured to be able to access
     information during the delayed execution such as the current user, any state associated
-    with the logical thread of execution, code-access security information, and so forth. 
+    with the logical thread of execution, code-access security information, and so forth.
     The start and end for the execution time will be published when the event fires.**)
-    and TaskInfo =  
+    and TaskInfo =
         { Context : System.Threading.ExecutionContext
           Edges : int array
           Id : int
@@ -28,15 +26,9 @@ namespace DirectGraphDependencies
           Start : DateTimeOffset option
           End : DateTimeOffset option }
 
-    // TODO : remove
-    //type IParallelTasksDAG = 
-    //    abstract member OnTaskCompleted : IObservable<TaskInfo>
-    //    abstract member ExecuteTasks : unit -> unit 
-    //    abstract member AddTask : (int * Func<Task> * (int array [<ParamArray>])) -> unit 
-
     type ParallelTasksDAG() as this =
 
-        let onTaskCompleted = new Event<TaskInfo>() 
+        let onTaskCompleted = new Event<TaskInfo>()
 
         let verifyThatAllOperationsHaveBeenRegistered (tasks:Dictionary<int, TaskInfo>) =
             let tasksNotRegistered =
@@ -102,26 +94,26 @@ namespace DirectGraphDependencies
                             match ops.[h].EdgesLeft.Value with
                             | 0 ->  getDependentOperation t ops (ops.[h] :: acc)
                             | _ ->  getDependentOperation t ops acc
-        (**The core of the solution is implemented using a MailboxProcessor (aka Agent) which provides several benefits. 
+        (**The core of the solution is implemented using a MailboxProcessor (aka Agent) which provides several benefits.
         Because the natural thread-safety of this is primitive,
-        I can use .NET mutable collection to simplify the implementation of DAG. 
-        Immutability is an important component for writing correct and lock-free concurrent applications. 
-        Another important component to reach a thread safe result is isolation. 
+        I can use .NET mutable collection to simplify the implementation of DAG.
+        Immutability is an important component for writing correct and lock-free concurrent applications.
+        Another important component to reach a thread safe result is isolation.
         The MailboxProcessor provides both concepts out of the box. In this case, we are taking advantage of isolation.**)
         let dagAgent =
             let inbox = new MailboxProcessor<TaskMessage>(fun inbox ->
-                (**The MailboxProcessor named dagAgent is keeping the registered tasks 
-                   in a current state “tasks” which is a map (tasks : Dictionary<int, TaskInfo>) 
+                (**The MailboxProcessor named dagAgent is keeping the registered tasks
+                   in a current state ï¿½tasksï¿½ which is a map (tasks : Dictionary<int, TaskInfo>)
                    between the id of each task and its details. **)
-                (**Agent also keeps the state of the edge dependencies for each task id (edges : Dictionary<int, int list>). 
-                   When the Agent receives the notification to start the execution, 
+                (**Agent also keeps the state of the edge dependencies for each task id (edges : Dictionary<int, int list>).
+                   When the Agent receives the notification to start the execution,
                    part of the process involves verifying that all the edge dependencies are registered and that there are no**)
-                let rec loop (tasks : Dictionary<int, TaskInfo>) 
+                let rec loop (tasks : Dictionary<int, TaskInfo>)
                              (edges : Dictionary<int, int list>) = async {
                         let! msg = inbox.Receive()
                         match msg with
-                        | ExecuteTasks -> 
-                            // If any of the validations are not satisfied, the process is interrupted and an error is thrown. 
+                        | ExecuteTasks ->
+                            // If any of the validations are not satisfied, the process is interrupted and an error is thrown.
                             // Verify that all operations are registered
                             verifyThatAllOperationsHaveBeenRegistered(tasks)
                             // Verify no cycles
@@ -131,7 +123,7 @@ namespace DirectGraphDependencies
                             let ops = new Dictionary<int, TaskInfo>()
 
                             // Fill dependency data structures
-                            for KeyValue(key, value) in tasks do 
+                            for KeyValue(key, value) in tasks do
                                 let operation =
                                     { value with EdgesLeft = Some(value.Edges.Length) }
                                 for from in operation.Edges do
@@ -148,26 +140,26 @@ namespace DirectGraphDependencies
                                                    | Some(n) when n = 0 -> inbox.Post(QueueTask(kv.Value))
                                                    | _ -> ())
                             return! loop ops fromTo
-                        (**If the validation passed successfully, the process starts the execution, 
-                           checking each task for dependencies thus enforcing the order and prioritization of execution. 
-                           In this last case the edge task is re-queued into the dagAgent using the “QueueTask” message. 
-                           Upon completion of a task, we simply remove the task from the graph. 
+                        (**If the validation passed successfully, the process starts the execution,
+                           checking each task for dependencies thus enforcing the order and prioritization of execution.
+                           In this last case the edge task is re-queued into the dagAgent using the ï¿½QueueTaskï¿½ message.
+                           Upon completion of a task, we simply remove the task from the graph.
                            This frees up all its dependencies to be executed.**)
-                        | QueueTask(taskInfo) -> 
+                        | QueueTask(taskInfo) ->
                                 Async.Start <| async {
                                     // Time and run the operation's delegate
                                     let start = DateTimeOffset.Now
                                     match taskInfo.Context with
                                     | null -> do! taskInfo.Task.Invoke() |> Async.AwaitTask
                                     | ctx ->
-                                        ExecutionContext.Run(ctx.CreateCopy(),  
+                                        ExecutionContext.Run(ctx.CreateCopy(),
                                                                 (fun op -> let opCtx = (op :?> TaskInfo)
                                                                            opCtx.Task.Invoke().ConfigureAwait(false) |> ignore
                                                                            ), taskInfo)
                                     let end' = DateTimeOffset.Now
                                     // Raise the operation completed event
                                     onTaskCompleted.Trigger  { taskInfo with Start = Some(start)
-                                                                             End = Some(end') }  
+                                                                             End = Some(end') }
 
                                     // Queue all the operations that depend on the completion
                                     // of this one, and potentially launch newly available
@@ -178,23 +170,23 @@ namespace DirectGraphDependencies
                                         depOps |> Seq.iter (fun nestedOp -> inbox.Post(QueueTask(nestedOp))) }
                                 return! loop tasks edges
 
-                        | AddTask(id, taskInfo) -> tasks.Add(id, taskInfo) 
+                        | AddTask(id, taskInfo) -> tasks.Add(id, taskInfo)
                                                    return! loop tasks edges
                     }
                 loop (new Dictionary<int, TaskInfo>(HashIdentity.Structural)) (new Dictionary<int, int list>(HashIdentity.Structural)))
-            inbox.Error |> Observable.add(fun ex -> printfn "Error : %s" ex.Message )
+            inbox.Error |> Observable.add(fun ex -> printfn $"Error : %s{ex.Message}" )
             inbox.Start()
             inbox
 
         // The event OnTaskCompleted triggered each time a task is completed providing details such as execution time.
-        member this.OnTaskCompleted = onTaskCompleted.Publish |> Observable.map(id)  
+        member this.OnTaskCompleted = onTaskCompleted.Publish |> Observable.map(id)
 
-        member this.ExecuteTasks() = dagAgent.Post ExecuteTasks  
+        member this.ExecuteTasks() = dagAgent.Post ExecuteTasks
 
-        (**The purpose of the function AddTask is to register a task including arbitrary dependency edges. 
-        This function accepts a unique id, a function task that has to be executed 
-        and a set of edges which are representing the ids of other registered tasks 
-        which all must all be completed before the current task can executed. 
+        (**The purpose of the function AddTask is to register a task including arbitrary dependency edges.
+        This function accepts a unique id, a function task that has to be executed
+        and a set of edges which are representing the ids of other registered tasks
+        which all must all be completed before the current task can executed.
         If the array is empty, it means there are no dependencies.**)
         member this.AddTask(id, task:Func<Task>, [<ParamArray>] edges : int array) =
             let data =
@@ -205,10 +197,4 @@ namespace DirectGraphDependencies
                   EdgesLeft = None
                   Start = None
                   End = None }
-            dagAgent.Post(AddTask(id, data))  
-
-        //interface IParallelTasksDAG with
-        //    member __.OnTaskCompleted = this.OnTaskCompleted
-        //    member __.ExecuteTasks() = this.ExecuteTasks()
-        //    member __.AddTask(id, task:Func<Task>, [<ParamArray>] edges : int array) =
-        //        this.AddTask(id, task, edges)
+            dagAgent.Post(AddTask(id, data))

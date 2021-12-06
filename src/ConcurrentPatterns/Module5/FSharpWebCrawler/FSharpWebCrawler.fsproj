@@ -7,11 +7,6 @@
 
     <ItemGroup>
         <Compile Include="AssemblyInfo.fs" />
-        <Content Include="Images\GinevraBenci.jpg" />
-        <Content Include="Images\velasquez.bmp" />
-        <Content Include="Images\MonaLisa.jpg" />
-        <Content Include="Images\LadyErmine.jpg" />
-        <Content Include="Images\picasso.bmp" />
         
         <Compile Include="Asynchronous\AsyncCombinators.fs" />
         <Compile Include="Asynchronous\AsyncModule.fs" />
@@ -20,14 +15,9 @@
 
         <Compile Include="Common\Helpers.fs" />
         <Compile Include="Common\Interfaces.fs" />
-        <Compile Include="Common\Common.fs" />
         <Compile Include="MessagePassing\Agent.fs" />
         <Compile Include="MessagePassing\ReactiveAgent.fs" />
         <Compile Include="MessagePassing\AgentPipeline.fs" />
-        <None Include="MessagePassing\Script.fsx" />
-        <Compile Include="WebCrawler\WebCrawler.fs" />
-        <Compile Include="WebCrawler\AgentWebCrawlerCompleted.fs" />
-        <Compile Include="WebCrawler\ParallelAgentWebCrawler.fs" />
         <Compile Include="WebCrawler\AgentWebCrawler.fs" />
         <Compile Include="Program.fs" />
         <None Include="AsyncScript.fsx" />

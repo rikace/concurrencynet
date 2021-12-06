@@ -33,13 +33,11 @@ namespace ConsoleTaskEx
             foreach (string fileName in files)
             {
                 await imageProcessingHelpers.LoadImage_Step1(fileName)
-                    .ContinueWith(imageInfo =>
-                    {
-                        // Error?
-                        // Cancel??
-                        return imageProcessingHelpers.ScaleImage_Step2(imageInfo.Result);
-                    }).Unwrap()
-                    .ContinueWith(imageInfo => { return imageProcessingHelpers.ConvertTo3D_Step3(imageInfo.Result); }).Unwrap()
+                        // TODO LAB
+                        // how can we implement an helper function to use/re-use to handle both
+                        // task Error and task Cancellation (in a centralize manner)
+                    .ContinueWith(imageInfo => imageProcessingHelpers.ScaleImage_Step2(imageInfo.Result)).Unwrap()
+                    .ContinueWith(imageInfo => imageProcessingHelpers.ConvertTo3D_Step3(imageInfo.Result)).Unwrap()
                     .ContinueWith(imageInfo => { imageProcessingHelpers.SaveImage_Step4(imageInfo.Result); });
             }
         }
@@ -54,15 +52,12 @@ namespace ConsoleTaskEx
 
             var files = Directory.GetFiles(source, "*.jpg");
 
-            // TODO
+            // TODO LAB
             // Implement the missing code for the
             // Task Then
             // Task Select
             // Task SelectMany
             // in "Common/Helpers.TaskComposition.cs"
-
-//   ImageProcessing.cs(65, 31): [CS1936] Could not find an implementation of the query pattern for source
-// type 'Task<ImageProcessingHelpers.ImageInfo>'.  'SelectMany' not found.
 
             Func<string, Task<ImageInfo>> transformer = imagePath =>
                 from image in imageProcessingHelpers.LoadImage_Step1(imagePath)
@@ -71,22 +66,15 @@ namespace ConsoleTaskEx
                 select converted3DImage;
 
             foreach (string fileName in files)
-                // Task SelectMany
+                // Task Then / SelectMany pieline
                 await transformer(fileName).Then(imageProcessingHelpers.SaveImage_Step4);
-            // Option using Task.WhenAll
-                //await transformer(fileName).SelectMany(imageProcessingHelpers.SaveImage_Step4);
 
-            // TODO RT
+            // TODO LAB
             // execute "transformer" operations in parallel (Option using Task.WhenAll)
             // NOTE: we should Throttle the task, how can we control the number of tasks run in parallel?
+            //       - Option using Task.WhenAll
+            //       - Throttle the tasks
 
-            // TODO RT
-            // Option using Task.WhenAll
-            // Throttle
-
-            // await Task.WhenAll(
-            //     files.Select(fileName => transformer(fileName).Then(saveImage_Step4))
-            // );
         }
     }
 }

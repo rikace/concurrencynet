@@ -12,7 +12,7 @@ using Agent =  ReactiveAgent.Agents.Agent;
 
 namespace ReactiveAgent
 {
-    public class AgentAggregate
+     public class AgentAggregate
     {
         static string CreateFileNameFromUrl(string url) =>
             Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
@@ -30,9 +30,9 @@ namespace ReactiveAgent
             };
 
 
-            // TODO 5.3
+            // TODO LAB
             // Agent fold over state and messages - Aggregate
-            urls.Aggregate(ImmutableDictionary<string, string>.Empty,
+            urls.Aggregate(new Dictionary<string, string>(),
                 (state, url) =>
                 {
                     if (!state.TryGetValue(url, out string content))
@@ -41,42 +41,25 @@ namespace ReactiveAgent
                             System.Console.WriteLine($"Downloading '{url}' sync ...");
                             content = webClient.DownloadString(url);
                             File.WriteAllText(CreateFileNameFromUrl(url), content);
-                            return state.Add(url, content);
+                            state.Add(url, content);
+                            return state;
                         }
 
                     return state;
                 });
 
-            // TODO : 5.3
+            // TODO LAB
             // (1) replace the implementation using the urls.Aggregate with a new one that uses an Agent
             // Suggestion, instead of the Dictionary you should try to use an immutable structure
 
-            var agentStateful_TODO = Agent.Start<Dictionary<string, string>>(msg => { });
+            // TODO LAB
+            // var agentStateful = Agent.Start ...
+
             // (2) complete this code
             urls.ForEach(url =>
             {
                 /* agentStateful.Post(url) */
             });
-
-            #region Solution
-
-            var agentStateful = Agent.Start(ImmutableDictionary<string, string>.Empty,
-                async (ImmutableDictionary<string, string> state, string url) =>
-                {
-                    if (!state.TryGetValue(url, out string content))
-                        using (var webClient = new WebClient())
-                        {
-                            content = await webClient.DownloadStringTaskAsync(url);
-                            await File.WriteAllTextAsync(CreateFileNameFromUrl(url), content);
-                            return state.Add(url, content);
-                        }
-
-                    return state;
-                });
-
-            urls.ForEach(url => agentStateful.Post(url));
-
-            #endregion
         }
     }
 }

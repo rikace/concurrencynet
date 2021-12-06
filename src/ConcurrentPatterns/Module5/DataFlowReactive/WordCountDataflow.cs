@@ -12,7 +12,7 @@ namespace DataflowPipeline
 {
     public class WordsCounterDataflow
     {
-        // TODO : 5.6
+        // TODO LAB
         // convert into producer/consumer word counter with agent
         // then convert any step with RX for testing
         public static void Start(CancellationToken cTok)
@@ -69,40 +69,30 @@ namespace DataflowPipeline
                     wordcount);
             });
 
-            // TODO RT Option 1
-            downloadBook.LinkTo(createWordList);
-            createWordList.LinkTo(filterWordList);
-            // TODO : 5.6
-            // Remove this step and replace with RX
-            filterWordList.LinkTo(printWordCount);
+            // TODO LAB
+            // Link the block to form the correct pipeline shape
+            // for the word-counter
 
-            // each completion task in the pipeline creates a continuation task
-            // that marks the next block in the pipeline as completed.
-            // A completed dataflow block processes any buffered elements, but does
-            // not accept new elements.
+            // TODO LAB
+            // use Reactive/Extensions (Observable) in the last step of the pipeline
+            // - Register the output of the last Dataflow block as Observable
+            // - Create an Observable step to maintain the state of the outputs in a collection
+            //   that removes duplicates.
+            // - Subscribe the observable to print the count of the unique words parsed
+            //     Ex: Subscribe(words => Console.WriteLine("Observable -> Found {0} words", words.Count));
 
-            // TODO RT Option 2
-            downloadBook.LinkTo(createWordList);
-            createWordList.LinkTo(broadcast);
-            broadcast.LinkTo(filterWordList);
-            broadcast.LinkTo(accumulator);
-            filterWordList.LinkTo(printWordCount);
+            // NOTE: each completion task in the pipeline creates a continuation task
+            //       that marks the next block in the pipeline as completed.
+            //       A completed dataflow block processes any buffered elements, but does
+            //       not accept new elements.
 
-            accumulator
-                .AsObservable()
+            // Add missing code here
 
-                .Scan(new HashSet<string>(),
-                    (state, words) =>
-                {
-                    state.AddRange(words);
-                    return state;
-                })
-                .Subscribe(words =>
-                    Console.WriteLine("Observable -> Found {0} words", words.Count));
+            // ...
+
 
             try
             {
-
                 downloadBook.Completion.ContinueWith(t =>
                 {
                     if (t.IsFaulted) ((IDataflowBlock) createWordList).Fault(t.Exception);
@@ -129,9 +119,6 @@ namespace DataflowPipeline
 
                 // Mark the head of the pipeline as complete.
                 downloadBook.Complete();
-
-                printWordCount.Completion.Wait();
-                // TODO RT
                 printWordCount.Completion.Wait(cTok);
 
                 Console.WriteLine("Finished. Press any key to exit.");

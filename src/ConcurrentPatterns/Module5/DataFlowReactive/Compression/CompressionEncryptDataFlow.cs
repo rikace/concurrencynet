@@ -1,5 +1,4 @@
-﻿using ReactiveAgent.CS;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -71,13 +70,13 @@ namespace ParallelCompressionCS
                     return (details, lastIndexProc);
                 }, cts);
 
-            // TODO 5.7
+            // TODO LAB
             // create write DataFlow block that push to the asOrderedAgent agent
             // the messages EncryptDetails received from the encryptor block
 
             var linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
 
-            // TODO 5.7
+            // TODO LAB
             // Link the DataFlow block to compress, encrypt and the safe the data file.
 
             long sourceLength = streamSource.Length;

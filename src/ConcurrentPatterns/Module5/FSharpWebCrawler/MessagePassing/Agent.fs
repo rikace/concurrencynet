@@ -12,7 +12,6 @@ open System.IO
 open FSharpWebCrawler.Async
 open FSharpWebCrawler
 
-
 let httpAsync (url : string) = async {
     let req = WebRequest.Create(url)
     let! resp = req.AsyncGetResponse()
@@ -58,10 +57,6 @@ type MailboxProcessor<'T> with
 
     member this.withSupervisor (supervisor: Agent<exn>) =
         this.Error.Add(supervisor.Post); this
-
-
-
-
 
 type MailboxProcessor<'a> with
     static member public parallelWorker (workers:int)

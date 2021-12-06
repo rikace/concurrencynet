@@ -11,14 +11,25 @@ namespace Functional.Async
     {
         public static Task<T> Return<T>(T task) => Task.FromResult(task);
 
-        public static async Task<R> Bind<T, R>(this Task<T> task, Func<T, Task<R>> cont)
-            => await cont(await task.ConfigureAwait(false)).ConfigureAwait(false);
+        public static async Task<R> Bind<T, R>(this Task<T> task, Func<T, Task<R>> continuation)
+            =>
+                // TODO
+                // Implement the Bind function using a  continuation programming style CPS
+                // passing the result of the primary "task" (T) into the "continuation" function
+                // that return a delegate with output a new Task type "Task<R>"
+                // The async operation should flow without blocking
+                default;
 
-        public static async Task<R> Map<T, R>(this Task<T> task, Func<T, R> map)
-            => map(await task.ConfigureAwait(false));
+        public static async Task<R> Map<T, R>(this Task<T> task, Func<T, R> projection)
+            =>
+                // TODO
+                // Implement the MAP function using a simple projection T -> R
+                // The async operation should flow without blocking
+                default;
 
-         public static async Task<R> SelectMany<T, R>(this Task<T> task,
-             Func<T, Task<R>> then) => await Bind(task, then);
+        public static async Task<R> SelectMany<T, R>(this Task<T> task,
+            Func<T, Task<R>> then) => await Bind(task, then);
+
         public static async Task<R> SelectMany<T1, T2, R>(this Task<T1> task,
             Func<T1, Task<T2>> bind, Func<T1, T2, R> project)
         {
@@ -29,7 +40,7 @@ namespace Functional.Async
         public static async Task<R> Select<T, R>(this Task<T> task, Func<T, R> project)
             => await Map(task, project);
 
-        //  Refresh of the Otherwise and Retry function
+        // TODO how to use this function?
         public static async Task<T> Otherwise<T>(this Task<T> task, Func<Task<T>> orTask) =>
             await task.ContinueWith(async innerTask =>
             {
@@ -37,6 +48,8 @@ namespace Functional.Async
                 return await Task.FromResult<T>(innerTask.Result);
             }).Unwrap();
 
+        // TODO how to use this function?
+        // can it throw a stackoverflow error?
         public static async Task<T> Retry<T>(this Func<Task<T>> task, int retries,
             TimeSpan delay, CancellationToken? cts = null) =>
             await task().ContinueWith(async innerTask =>

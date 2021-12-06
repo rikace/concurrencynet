@@ -10,13 +10,15 @@ namespace AsyncOperations
 
     public class WebCrawlerAsync
     {
-        // TODO complete the Memoize implementation
+        // TODO LAB
+        // complete the Memoize implementation
         // Web crawler execution using memoization
         public static Func<string, IEnumerable<string>> WebCrawlerMemoized =
             Memoization.Memoize<string, IEnumerable<string>>(WebCrawler);
 
-        // TODO complete the MemoizeThreadSafe implementation
-        //  Thread-safe memoization function
+        // TODO LAB
+        // complete the MemoizeThreadSafe implementation
+        // Thread-safe memoization function
         public static Func<string, IEnumerable<string>> WebCrawlerMemoizedThreadSafe =
             Memoization.MemoizeThreadSafe<string, IEnumerable<string>>(WebCrawler);
 

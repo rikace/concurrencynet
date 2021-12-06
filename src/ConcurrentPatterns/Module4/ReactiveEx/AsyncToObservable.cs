@@ -16,7 +16,7 @@ namespace ReactiveEx
             var hwr = WebRequest.CreateDefault(new Uri(url)) as HttpWebRequest;
             var requestFunc = hwr.GetResponseAsync();
 
-            // TODO
+            // TODO LAB
             // Generate a WebResponse Observable
             // then, using the web-response, extract the text of the
             // http content from the underlying stream

@@ -11,6 +11,7 @@ namespace TPLAgent
 {
    public class PingPongAgents
     {
+        // TODO LAB
         // Implement two Agent that send messages to each others
         // playing Ping/Pong
         // NOTE: Add delay between messages
@@ -37,7 +38,7 @@ namespace TPLAgent
 
                 // TODO
                 // Add code implementation here
-                
+
                 return newCount;
             });
 

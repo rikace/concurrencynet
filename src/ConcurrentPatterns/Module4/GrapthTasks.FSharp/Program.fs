@@ -10,7 +10,7 @@ let main argv =
 
     let action(id, (delay:int)) = Func<Task>(fun () ->
             async {
-                printfn "Starting operation %d in Thread Id %d" id Thread.CurrentThread.ManagedThreadId
+                printfn $"Starting operation %d{id} in Thread Id %d{Thread.CurrentThread.ManagedThreadId}"
                 do! Async.Sleep delay
             } |> startAsPlainTask)
 

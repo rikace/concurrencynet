@@ -91,31 +91,19 @@ namespace ParallelPatterns
             int inCircle = 0;
             var random = new Helpers.ThreadSafeRandom();
 
-            // Parallel.For/Foreach  + ThreadLocal
-            // CAS
-            //
+            // Parallel.For/Foreach  + ThreadLocal + CAS
 
-            // TODO
+            // TODO LAB
             // Implement a better "Parallel.For" using these option constructs:
-            // - ParallelOptions  (9// )doesn't make sense to use more threads than we have processors)
+            // - ParallelOptions: doesn't make sense to use more threads than we have processors
             // - ThreadLocal
+
+            // NOTE this is the calculation code to use in the parallel loop body
+            // double a, b;
+            // return tLocal += Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1 ? 1 : 0;
+
             // UNCOMMENT : Parallel.For(0, iterations,
             //             name of ThreadLocal variable "tLocal
-
-            //double a, b;
-            //return tLocal += Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1 ? 1 : 0;
-            Parallel.For(0, iterations,
-                // doesn't make sense to use more threads than we have processors
-                new ParallelOptions() {MaxDegreeOfParallelism = Environment.ProcessorCount},
-                () => 0,
-                (i, _, tLocal) =>
-                {
-                    double a, b;
-                    return tLocal += Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1
-                        ? 1
-                        : 0;
-                },
-                subTotal => Interlocked.Add(ref inCircle, subTotal));
 
 
             return ((double) inCircle / iterations) * 4;
@@ -138,9 +126,30 @@ namespace ParallelPatterns
                     (agg, subTotal) => agg + subTotal, // Aggregating subtotals
                     result => result); // No projection of result needed
 
-
             // Implement the sum of the parallel query using the apposite operator
             // NOTE : check the "Aggregate" as possible solution
+            return ((double) inCircle / iterations) * 4;
+        }
+
+        // TODO LAB
+        public static double PLINQPartitionerCalculate(int iterations)
+        {
+            var random = new Helpers.ThreadSafeRandom();
+
+                var inCircle = ParallelEnumerable.Range(0, iterations)
+                // doesn't make sense to use more threads than we have processors
+                .WithDegreeOfParallelism(Environment.ProcessorCount)
+                .Select(_ =>
+                {
+                    double a, b;
+                    return Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1;
+                })
+                .Sum(_ => 1);  // REMOVE THIS LINE TO COMPLETE THE TASK
+
+            // TODO LAB
+            // Use the previous implementation from "PLINQCalculate", in this case
+            // apply a "Partitioner" to improve the performance
+
             return ((double) inCircle / iterations) * 4;
         }
     }

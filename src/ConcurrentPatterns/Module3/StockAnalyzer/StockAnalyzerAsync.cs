@@ -30,10 +30,11 @@ namespace StockAnalyzer
                 return await reader.ReadToEndAsync().ConfigureAwait(false);
         }
 
+        // TODO LAB
         static async Task<string> ProcessStockHistoryConditional(string symbol, CancellationToken token)
         {
             Func<string, Task<string>> downloadStock = stock => HttpDownloadStockHistory(stock, token);
-            Func<string, Task<string>> fetchStock = stock => FetchStockHistory(stock, token);
+            Func<string, Task<string>> fetchStock = stock => HttpDownloadStockHistory(stock, token);
 
             // TODO (1)
             // Take a look at these operators (in \AsyncOperation\AsyncEx)
@@ -48,10 +49,7 @@ namespace StockAnalyzer
             // add here the Data transformation into "Tuple<string, StockData[]>" rather then into the function ProcessStockHistory.
             // This data transformation should use a continuation style (look for example into LINQ / SelectMany style, for example the Bind and Map function into the Async module)
             // .Map(prices => Tuple.Create(symbol, prices));
-
-
             return null;
-
         }
 
         private static async Task<Tuple<string, StockData[]>> ProcessStockHistory(string symbol, CancellationToken cTok)
@@ -63,7 +61,6 @@ namespace StockAnalyzer
 
         public static async Task ProcessStockHistoryParallel(IEnumerable<string> stockSymbols, CancellationToken cTok)
         {
-            // IAsyncEnumerable
             IEnumerable<Task<Tuple<string, StockData[]>>> stockHistoryTasks =
                 // TODO RT Ensure to run in parallel the tasks
                 stockSymbols.Select(stock => ProcessStockHistory(stock, cTok));

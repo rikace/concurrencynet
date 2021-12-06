@@ -38,12 +38,11 @@ namespace ActorMapReduceWordCount.Actors
 
         private void SetupBehaviors(IWriteStuff writer)
         {
-            Receive<StartCount>(msg =>
-            {
-                var fileInfo = new FileInfo(msg.FileName);
-                var lineNumber = 0;
-
-                // TODO
+            // TODO LAB
+            // Register an Actor handler for a message type "StartCount".
+            // The inner body should read the message info to create a "FileInfo" object.
+            // Then
+                //
                 // (1) Create a child reader actor (LineReaderActor) using the current Context.
                 // To instantiate an actor you should use a "Props".
                 // for true parallelism, instantiate the actor using a Pool that load-balance
@@ -63,7 +62,6 @@ namespace ActorMapReduceWordCount.Actors
                 // CODE HERE
 
 
-            });
 
             Receive<MappedList>(msg =>
             {

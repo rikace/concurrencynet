@@ -36,7 +36,7 @@ namespace ConsoleTaskEx
 
             // TODO
             // Complete the ParallelPatterns missing code
-            // "ParallelPatterns/ParallelPatterns.cs"
+            // "Pipeline.cs"
             var imagePipe =
                 ParallelPatterns.Pipeline<string, ImageInfo>.Create(imageProcessingHelpers.LoadImage_Step1);
 

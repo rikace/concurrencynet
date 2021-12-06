@@ -13,21 +13,32 @@ namespace Pipeline.PipelinePatterns
     {
         private List<IDataflowBlock> _steps = new List<IDataflowBlock>();
 
+        // Example using TPL Dataflow
+        // public static TransformBlock<string, string> CreatePipeline(Action<bool> resultCallback)
+        // {
+        //     var step1 = new TransformBlock<string, string>((sentence) => // do something (sentence));
+        //         var step2 = new TransformBlock<string, int>((word) => word.Length);
+        //     var step3 = new TransformBlock<int, bool>((length) => length % 2 == 1);
+        //     var callbackStep = new ActionBlock<bool>(resultCallback);
+        //     step1.LinkTo(step2, new DataflowLinkOptions());
+        //     step2.LinkTo(step3, new DataflowLinkOptions());
+        //     step3.LinkTo(callbackStep);
+        //     return step1;
+        // }
+
         public void AddStep<TIn, TLocalOut>(Func<TIn, Task<TLocalOut>> stepFunc)
         {
             // TODO
             // Implement a step that
             // (1) create a TPL Dataflow block that handles the "stepFunc" function
             //     for mapping the input TIn to output TLocalOut
-            var step = new TransformBlock<TIn, TLocalOut>(async input =>
-                await stepFunc(input));
+
+            // add implementation
+            IDataflowBlock step = default;
+
             if (_steps.Count > 0)
             {
-                // (2) append/link the block created (1) to the last from the "_steps" list.
-
-                var lastStep = _steps.Last();
-                var targetBlock = (lastStep as ISourceBlock<TIn>);
-                targetBlock.LinkTo(step, new DataflowLinkOptions());
+                // (2) append/link the block created (1) to the last block from the "_steps" list.
             }
 
             _steps.Add(step);
@@ -42,19 +53,6 @@ namespace Pipeline.PipelinePatterns
 
             return (_steps.First() as ITargetBlock<TIn>);
         }
-
-        // Example using TPL Dataflow
-        // public static TransformBlock<string, string> CreatePipeline(Action<bool> resultCallback)
-        // {
-        //     var step1 = new TransformBlock<string, string>((sentence) => // do something (sentence));
-        //         var step2 = new TransformBlock<string, int>((word) => word.Length);
-        //     var step3 = new TransformBlock<int, bool>((length) => length % 2 == 1);
-        //     var callbackStep = new ActionBlock<bool>(resultCallback);
-        //     step1.LinkTo(step2, new DataflowLinkOptions());
-        //     step2.LinkTo(step3, new DataflowLinkOptions());
-        //     step3.LinkTo(callbackStep);
-        //     return step1;
-        // }
 
         public static void ExecuteImageProcessing(string source, string destination)
         {
@@ -73,12 +71,9 @@ namespace Pipeline.PipelinePatterns
                 pipeline.Post(image);
             }
 
-            // TODO RT sdd parellelism and biffer amd cancellation?
-            // var options = new ExecutionDataflowBlockOptions()
-            //     {
-            //         MaxDegreeOfParallelism = dop,
-            //         BoundedCapacity = 5,
-            //     };
+            // TODO
+            // Optimize the pipeline:
+            // add degree of parallelism and/or buffer and/or cancellation
         }
     }
 }

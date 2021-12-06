@@ -8,31 +8,6 @@ namespace DataParallelism
 {
     public static class ForkJoin
     {
-        public static R Invoke<T, R>(Func<R, T, R> reduce, Func<R> seedInit, params Func<T>[] operations)
-        {
-            var tasks = (from op in operations
-                select Task.Run(op)).ToArray();
-            Task.WhenAll(tasks);
-            return tasks.Select(t => t.Result).Aggregate(seedInit(), reduce);
-        }
-
-        public static R InvokeParChildRelationship<T, R>(Func<R, T, R> reduce, Func<R> seedInit,
-            params Func<T>[] operations)
-        {
-            var results = new T[operations.Length];
-            var task = Task.Run(() =>
-            {
-                for (int i = 0; i < operations.Length; i++)
-                {
-                    int index = i;
-                    Task.Factory.StartNew(() => results[index] = operations[index](),
-                        TaskCreationOptions.AttachedToParent);
-                }
-            });
-            Task.WhenAny(task);
-            return results.Aggregate(seedInit(), reduce);
-        }
-
         public static Task Tee<T>(
             this Task<T> task,
             Action<T> tee)
@@ -62,35 +37,25 @@ namespace DataParallelism
         public static R Invoke<T, R>(Func<R, T, R> reduce, Func<R> seedInit, params Func<Task<T>>[] operations)
         {
             // TODO RT
-            // Implement a parallel fork-join
+            // Implement a parallel fork-join (you can use Parallel for/loop with accumulator or PLINQ or ??)
             // Note that the operations run in different tasks "Func<Task<T>>[]"
             // Use either "Parallel.For" collect and aggregate the results
             //             or PLINQ
             //             or run multiple Tasks in parallel and wait/aggregate the results
 
-            var results = new T[operations.Length];
-            var tasks = new Task[operations.Length];
-            for (int i = 0; i < operations.Length; i++)
-            {
-                int index = i;
-                var task = operations[index]().Tee(result => results[index] = result);
-                tasks[index] = task;
-            }
-
-            Task.WaitAll(tasks);
-            return results.Aggregate(seedInit(), reduce);
+            return default;
         }
 
-        public static R InvokeParallelLoop<T, R>(Func<R, T, R> reduce, Func<R> seedInit, params Func<T>[] operations)
+        public static R Invoke<T, R>(Func<R, T, R> reduce, Func<R> seedInit, params Func<T>[] operations)
         {
-            var results = new T[operations.Length];
-            Parallel.For(0, operations.Length, i => results[i] = operations[i]());
-            return results.Aggregate(seedInit(), reduce);
-        }
+            // TODO RT
+            // Implement a parallel fork-join (you can use Parallel for/loop with accumulator or PLINQ or ??)
+            // Note that the operations run in different tasks "Func<Task<T>>[]"
+            // Use either "Parallel.For" collect and aggregate the results
+            //             or PLINQ
+            //             or run multiple Tasks in parallel and wait/aggregate the results
 
-        public static R InvokePLINQ<T, R>(Func<R, T, R> reduce, Func<R> seedInit, params Func<T>[] operations)
-        {
-            return operations.AsParallel().Select(f => f()).Aggregate(seedInit(), reduce);
+            return default;
         }
     }
 }

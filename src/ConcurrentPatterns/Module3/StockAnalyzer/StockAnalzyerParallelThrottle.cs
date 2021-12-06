@@ -16,7 +16,7 @@ namespace StockAnalyzer
     public partial class StockAnalyzer
     {
         //  The Bind operator in action
-        // TODO : 4.7
+        // TODO LAB
         // implement the bind operator respecting the top signature
         // the implementation should be full async (no blocking)
         // take a look at the Bind operator
@@ -30,18 +30,20 @@ namespace StockAnalyzer
                 .Map(stockData => Tuple.Create(symbol, stockData));
         }
 
-        // TODO : 4.9
+        // TODO LAB
         // Process the Stock-History analysis for all the stocks in parallel
         public static async Task ProcessStockHistoryThrottle(IEnumerable<string> stockSymbols, CancellationToken cTok)
         {
-            // TODO
+            // TODO LAB
             // (1) Process the stock analysis in parallel
             // When all the computation complete, then output the stock details
+            // Than control the level of parallelism processing max 2 stocks at a given time
+            // Suggestion, use the RequestGate class (and/or ExecuteInWithDegreeOfParallelism class)
 
-            // TODO RT option 2
+            // TODO LAB
             List<Tuple<string, StockData[]>> stockHistoryTasks = new List<Tuple<string, StockData[]>>();
 
-            // TODO RT execute in parallel to generate the "stockHistoryTasks" using the function
+            // TODO: execute in parallel to generate the "stockHistoryTasks" using the function
             // - ProcessStockHistoryBind(symbol, cTok)
             // NOTE: control the level of parallelism processing max 2 stocks at a given time using the "ExecuteInWithDegreeOfParallelism.ExecuteInParallel" function
 

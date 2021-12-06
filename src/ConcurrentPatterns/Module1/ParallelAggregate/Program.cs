@@ -1,5 +1,4 @@
 ﻿using Helpers;
-using ParallelFilterMap;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -18,20 +17,6 @@ namespace ParallelPatterns
 {
     class Program
     {
-        static void BadMapReduce(IEnumerable<FileInfo> files)
-        {
-            // DEMO bad map/reduce
-            var wr = new WordReducer();
-
-            foreach (var file in files)
-            {
-                string fileContent = File.ReadAllText(file.FullName);
-                wr.MapReduce(fileContent);
-            }
-
-            var result = wr.WordStore;
-            // Do something with "result"
-        }
 
         static void Main(string[] args)
         {
@@ -39,88 +24,44 @@ namespace ParallelPatterns
             var dir = new DirectoryInfo(dataFolder);
             var files = dir.GetFiles("*.txt");
 
-            // DEMO bad map/reduce
-            // BadMapReduce(files);
 
-            // DEMO
-            // ThreadLocalStorage
-
-            // DEMO
-            // WordsCounterDemo
-
-            // How do we inject a "stop words" predicate ?
+            // TODO: bonus How do we inject a "stop words" predicate ?
             var stopWords = File.ReadAllLines($"{dataFolder}/StopWords.txt");
 
-            // (1) implement ForkJoin
-            // use/show TaskCompletionSource
+            // Step (1) implement ForkJoin
+            // use TaskCompletionSource as possible option
             // Notes: Throttling, ProcessAsComplete
-            //  SyncForkJoin(files);
-            //  TaskForkJoin(files);
+            // TaskForkJoin(files); // note this is a blocking function for demo purpose, we could return a Task
 
-            // (2) implement Parallel Map
+
+            // Step  (2) implement Parallel Map
             // Map(files);
 
-            // (3) implement parallel Reduce
+            // Step (3) implement parallel Reduce
             // Reduce(files);
 
-            // (4) implement parallel Map/Reduce
+            // Step (4) implement parallel Map/Reduce
             // MapReduce(files);  // for loops do not compose!!
 
             Console.WriteLine("COMPLETE");
             Console.ReadLine();
         }
 
-        private static void SyncForkJoin(FileInfo[] files)
-        {
-
-
-
-            var operations = files.Select<FileInfo, Func<string[]>>(file => () => File.ReadAllLines(file.FullName))
-                .ToArray();
-            var result = ForkJoin.InvokeParallelLoop(
-                reduce: (state, lines) =>
-                {
-                    // If you call ContainsKey, and then Add, you are checking if the key exists twice.
-                    // if (state.ContainsKey(item))
-                    //     state[item]++;
-                    // else
-                    //     state.TryAdd(item, 1);
-                    foreach (var line in lines.Where(l => !string.IsNullOrEmpty(l)))
-                    {
-                        var words = line.Split(Delimiters);
-                        words.ForAll(word =>
-                        {
-                            var cleanupWord = word.RemoveNumbers().Cleanup();
-                            if (!string.IsNullOrEmpty(cleanupWord))
-                                state.AddOrUpdate(cleanupWord, x => 1, (x, count) => count + 1);
-                        });
-                    }
-
-                    return state;
-                },
-                seedInit: () => new ConcurrentDictionary<string, int>(),
-                operations: operations);
-
-            var topMostUsedWords =
-                result.OrderByDescending(kv => kv.Value).Take(5);
-            foreach (var topMostUsedWord in topMostUsedWords)
-            {
-                Console.WriteLine($"The word \"{topMostUsedWord.Key}\" is used {topMostUsedWord.Value} times");
-            }
-        }
-
         private static void TaskForkJoin(FileInfo[] files)
         {
             var operationTasks = files
                 .Select<FileInfo, Func<Task<string[]>>>(file => () => File.ReadAllLinesAsync(file.FullName)).ToArray();
+
             var result = ForkJoin.Invoke(
                 reduce: (state, lines) =>
                 {
+                    // NOTE
                     // If you call ContainsKey, and then Add, you are checking if the key exists twice.
                     // if (state.ContainsKey(item))
                     //     state[item]++;
                     // else
                     //     state.TryAdd(item, 1);
+
                     foreach (var line in lines.Where(l => !string.IsNullOrEmpty(l)))
                     {
                         var words = line.Split(Delimiters);
@@ -128,7 +69,16 @@ namespace ParallelPatterns
                         {
                             var cleanupWord = word.RemoveNumbers().Cleanup();
                             if (!string.IsNullOrEmpty(cleanupWord))
-                                state.AddOrUpdate(cleanupWord, x => 1, (x, count) => count + 1);
+                            {
+                                // TODO LAB bonus
+                                // NOTE
+                                // If you call ContainsKey, and then Add, you are checking if the key exists twice.
+                                // What can we do better ?
+                                if (state.ContainsKey(cleanupWord))
+                                    state[cleanupWord]++;
+                                else
+                                    state.TryAdd(cleanupWord, 1);
+                            }
                         });
                     }
 
@@ -139,6 +89,7 @@ namespace ParallelPatterns
 
             var topMostUsedWords =
                 result.OrderByDescending(kv => kv.Value).Take(5);
+
             foreach (var topMostUsedWord in topMostUsedWords)
             {
                 Console.WriteLine($"The word \"{topMostUsedWord.Key}\" is used {topMostUsedWord.Value} times");
@@ -149,9 +100,8 @@ namespace ParallelPatterns
         {
             var largerFile = files.OrderByDescending(f => f.Length).First();
             var lines = File.ReadAllLines(largerFile.FullName);
-            // Select is like Map/Projection
-            var words = lines.AsParallel().SelectMany(line => line.Split(' ', ',', ';', ':', '\"', '.'));
 
+            // Select is like Map/Projection
             // However, in the context of Map/Reduce, we need to extract a Key used in the shuffle step to reference in the Reduce step.
             // For this case, we can use the Grouping concept.
 
@@ -204,7 +154,7 @@ namespace ParallelPatterns
             using (var reader = new StringReader(content))
             {
                 var query =
-                    reader.EnumLines() // This could be an AsyncStream
+                    reader.EnumLines() // This could be an AsyncStream right? :)
 
                         // TODO : complete the map-reduce function
                         // Bonus, implement the override function that takes two values

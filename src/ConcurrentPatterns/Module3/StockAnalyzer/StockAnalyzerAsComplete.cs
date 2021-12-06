@@ -20,11 +20,10 @@ namespace StockAnalyzer
             List<Task<Tuple<string, StockData[]>>> stockHistoryTasks =
                 stocks.Select(symbol => ProcessStockHistory(symbol, cTok)).ToList();
 
-            // TODO RT
+            // TODO LAB
             // Implement an algorithm to execute all the tasks
             // in parallel and then to process each task as soon as one completes (order does not matter)
             // Process the Task using the function "DisplayStockInfo"
-
             while (stockHistoryTasks.Count > 0)
             {
                 // Delay for Demo purpose

@@ -25,14 +25,17 @@ namespace AsyncOperations
             if (!Directory.Exists(destination))
                 Directory.CreateDirectory(destination);
 
-            // TODO 1
+            // TODO LAB 1
             WebCrawlerAsync.RunDemo(urls);
 
-            // TODO 2
+            Console.WriteLine("Completed Step 1");
+            Console.ReadLine();
+
+            // TODO LAB 2
             await ThrottleAsyncOperations.DownloadSiteIconsAsync(urls);
 
 
-            Console.WriteLine("Completed");
+            Console.WriteLine("Completed Step 2");
             Console.ReadLine();
         }
     }

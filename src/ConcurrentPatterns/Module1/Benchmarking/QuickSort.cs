@@ -115,16 +115,12 @@ namespace BenchmarkParallelPatterns
 
         private static void Swap<T>(IList<T> arr, int i, int j)
         {
-            var tmp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = tmp;
+            (arr[i], arr[j]) = (arr[j], arr[i]);
         }
 
         static void SwapElements<T>(T[] array2, int i, int j)
         {
-            T temp = array2[i];
-            array2[i] = array2[j];
-            array2[j] = temp;
+            (array2[i], array2[j]) = (array2[j], array2[i]);
         }
     }
 }

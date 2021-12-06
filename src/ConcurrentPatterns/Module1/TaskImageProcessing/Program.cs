@@ -10,8 +10,6 @@ namespace ConsoleTaskEx
     {
         static void Main(string[] args)
         {
-            // TASK DEMO
-
             var sourceImages = "../../../../../Data/Images";
             var destination = "./Images/Output";
             if (!Directory.Exists(destination))
@@ -22,8 +20,8 @@ namespace ConsoleTaskEx
             // TODO :
             //      try different concurrent implementations
 
-            //imageProc.RunContinuation().Wait();
-            imageProc.RunTransformer().Wait();
+            imageProc.RunContinuation().Wait();
+            // TODO: imageProc.RunTransformer().Wait();
 
             Console.WriteLine("Completed");
             Console.ReadLine();

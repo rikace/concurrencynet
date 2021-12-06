@@ -23,7 +23,8 @@ namespace ProducersConsumers
         {
             Console.WriteLine($"Stage 1 - is running with Thread ID #{Thread.CurrentThread.ManagedThreadId}");
 
-            //  await foreach (var item in inputData.Reader.ReadAllAsync())
+            // The ChannelReader supports AsyncEnumerable
+            // like: await foreach (var item in inputData.Reader.ReadAllAsync())
             while (await inputData.Reader.WaitToReadAsync())
             {
                 var receivedItem = await inputData.Reader.ReadAsync();
@@ -143,6 +144,7 @@ namespace ProducersConsumers
                 //     and write back to the Outputs channels of the new created array
 
                 // (4) close all the outputs channels
+
             });
 
             // (5) returns an array of Channel Readers from  the output array

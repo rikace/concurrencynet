@@ -63,34 +63,21 @@ namespace Dataflow.WebCrawler
         static BlockingCollection<string> pending = new BlockingCollection<string>();
         static ConcurrentDictionary<string, bool> visited = new ConcurrentDictionary<string, bool>();
 
-        // TODO : 1.1
+        // TODO LAB
         // (1) implement a web-crawler
         // leverage the pending & visited collections to avoid to download the same site twice
-        // can you leverage Memoization ?
+        // can you leverage Memoization (?)
+        // Use the "pending" collection to keep adding new links found to keep crawling
         async static Task Crawler()
         {
-            // code here
-            // check the API of the "BlockingCollection" to get the an
-            // item safely
-
+            // Add missing code here
+            // check the API of the "BlockingCollection" to get the an item safely
             // Use the Memoize function to check if a web page has been already visited
-
-            while (pending.TryTake(out var url))
-            {
-                var content = await DownloadDocument(url);
-                var tilte = GetTitle(content);
-                Console.WriteLine($"The title of {url} is {tilte}");
-
-                foreach (var link in ExtractLinks(content))
-                {
-                    pending.Add(link);
-                }
-            }
         }
 
         // --------------------------------------------------------------
         // Start 100 web-crawlers concurrent using only small number of threads
-        static void Run()
+        public static async Task Run()
         {
             pending.Add("https://www.cnn.com");
             pending.Add("https://www.foxnews.com");
@@ -99,7 +86,7 @@ namespace Dataflow.WebCrawler
 
             // TODO how can I lunch 10 concurrent Crawler?
             for (int i = 0; i < 10; i++)
-                Crawler();
+                await Crawler();
         }
     }
 }

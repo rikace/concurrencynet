@@ -13,7 +13,6 @@ namespace AkkaFractal.Web.Akka
     public class SseTileActor : ReceiveActor
     {
         private IActorRef renderActor;
-
         public SseTileActor(IServerSentEventsService serverSentEventsService, IActorRef tileRenderActor)
         {
             Receive<RenderImage>(request =>
@@ -35,13 +34,6 @@ namespace AkkaFractal.Web.Akka
                 // NOTE: To create a Child Actor you should use the current "Context"
                 // NOTE: To check if an Actor does not exist use the "ActorRefs.Nobody" value
 
-                if (Context.Child("RenderActor").Equals(Nobody.Instance))
-                {
-                    renderActor = Context.ActorOf(
-                        Props.Create(() =>
-                            new RenderActor(serverSentEventsService, request.Width, request.Height, split)), "RenderActor");
-                }
-
 
                 for (var y = 0; y < split; y++)
                 {
@@ -54,9 +46,7 @@ namespace AkkaFractal.Web.Akka
                         // pass the previously instantiated "renderActor" IActorRef as the "Sender" of the following "tileRenderActor" Message-Payload.
                         // in this way, when the "tileRenderActor" completes the computation, the response send with "Sender.Tell" will be sent
                         // to the "renderActor" actor rather then the current "SseTileActor"
-                        tileRenderActor.Tell(
-                            new RenderTile(yy, xx, xs, ys, request.Height, request.Width),
-                            renderActor );
+                        tileRenderActor.Tell(new RenderTile(yy, xx, xs, ys, request.Height, request.Width));
                     }
                 }
 

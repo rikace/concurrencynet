@@ -13,7 +13,6 @@ module HelperType =
 
 module ImageHelpers =
 
-
     let convertImageTo3D (image:Image<Rgba32> ) =
         Helpers.ImageHandler.ConvertTo3D(image)
 
@@ -82,7 +81,7 @@ let main argv =
 
     ``TamingAgent example``.transformImages()
 
-    ``Composing TamingAgent with Kleisli operator example``.transformImages();
+    // ``Composing TamingAgent with Kleisli operator example``.transformImages();
 
     Console.ReadLine() |> ignore
     0

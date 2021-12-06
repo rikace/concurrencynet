@@ -9,7 +9,7 @@ namespace ParallelPatterns
 {
     public class Pipeline<TInput, TOutput>
     {
-        private readonly Func<TInput, Task<TOutput>> _processoTask;
+        private readonly Func<TInput, Task<TOutput>> _processTask;
         private readonly Func<TInput, TOutput> _processor;
 
         private readonly BlockingCollection<TInput>[] _input;
@@ -28,7 +28,7 @@ namespace ParallelPatterns
             for (var i = 0; i < Output.Length; i++)
                 Output[i] = null == _input[i] ? null : new BlockingCollection<TOutput>(Count);
 
-            _processoTask = processor;
+            _processTask = processor;
             _token = token;
             Task.Factory.StartNew(Run, _token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
@@ -61,7 +61,6 @@ namespace ParallelPatterns
 
         private BlockingCollection<TOutput>[] Output { get; }
 
-        // TODO (3.a)
         public Pipeline<TOutput, TMid> Then<TMid>(
             Func<TOutput, Task<TMid>> project,
             CancellationToken token = new CancellationToken())
@@ -72,43 +71,29 @@ namespace ParallelPatterns
             CancellationToken token = new CancellationToken())
             => new Pipeline<TOutput, TMid>(project, Output, token);
 
-        // TODO (3.b)
+        // TODO LAB
         public void Enqueue(TInput item)
         {
-            var sw = new SpinWait();
-            while (!(BlockingCollection<TInput>.TryAddToAny(_input, item) >= 0))
-                sw.SpinOnce();
+            // TODO complete missing code
+            // We nee to enqueue the input into a callBack
+            // for the collection "continuations" avoiding contentions
+
         }
 
         private async Task Run()
         {
             var sw = new SpinWait();
 
-            // TODO (3.b)
+            // TODO LAB
             // Add missing code, steps to implement
             // 1 - take an item from the _input collection
 
             // 2 - process the item with the internal function
-            //          either _processor or _processoTask according to the active one
-            // 3 - push the result to the Output collec
+            //          either _processor or _processTask according to the active one
+            // 3 - push the result to the Output collect
             // Bonus :  avoid contention in case of empty queue.
-            //          Check "SpinWait" (see aboue instance "sw")
+            //          Check "SpinWait" (use above instance "sw")
 
-            while (!_input.All(bc => bc.IsCompleted) && !_token.IsCancellationRequested)
-            {
-                var i = BlockingCollection<TInput>.TryTakeFromAny(_input, out var receivedItem, 50, _token);
-                if (i >= 0)
-                {
-                    TOutput outputItem =
-                        _processor != null ? _processor(receivedItem) : await _processoTask(receivedItem);
-                    BlockingCollection<TOutput>.AddToAny(Output, outputItem);
-                    sw.SpinOnce();
-                }
-                else
-                {
-                    Thread.SpinWait(1000);
-                }
-            }
 
             if (Output != null)
             {

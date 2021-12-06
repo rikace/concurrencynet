@@ -24,11 +24,9 @@ namespace ParallelPatterns
 
     public partial class ParallelFuzzyMatch
     {
-        public static void RunFuzzyMatchPipelineCSharp(
-            string[] wordsLookup,
-            IList<string> files)
+        public static void RunFuzzyMatchPipelineCSharp(string[] wordsLookup, IList<string> files)
         {
-            // TODO (3) : In the previous example you have implemented the Monadic operator SelectMany (usually called Bind)
+            // TODO LAB : In the previous example you have implemented the Monadic operator SelectMany (usually called Bind)
             // This operator enables the compiler to understand the monadic (LINQ) pattern, which allows you to write
             // expressive/declarative code in LINQ style
             // Let's implement a parallel Pipeline that allows you to keep the continuation semantic,
@@ -51,7 +49,7 @@ namespace ParallelPatterns
             // When you are complete, uncomment the code and run it
 
 
-            // TODO (3) Start C# Pipeline
+            // TODO LAB : Start C# Pipeline
             var pipeline = Pipeline<string, string[]>.Create(file => File.ReadAllLinesAsync(file));
 
             pipeline
@@ -79,6 +77,7 @@ namespace ParallelPatterns
                 string[] wordsLookup,
                 IEnumerable<string> files)
         {
+            // TODO LAB
             // An alternative pattern to parallelize the FuzzyMatch is the "Process as complete"
             // The idea of this pattern is to start the execution of all the operations (tasks)
             // at the same time, and then process them as they complete instead of waiting for all the operations
@@ -92,8 +91,7 @@ namespace ParallelPatterns
 
             var readFileTasks =
                 (from file in files
-                 select File.ReadAllTextAsync(file)
-                ).ToList();
+                 select File.ReadAllTextAsync(file)).ToList();
 
             while (readFileTasks.Count > 0)
             {
@@ -137,7 +135,8 @@ namespace ParallelPatterns
         {
             var matchSet = new HashSet<WordDistanceStruct>();
 
-            // TODO (4) : Implement a reusable function called "ContinueAsComplete" to abstract the implementation of the
+            // TODO LAB
+            // Implement a reusable function called "ContinueAsComplete" to abstract the implementation of the
             // previous method "RunFuzzyMatchTaskProcessAsCompleteBasic".
             // The function "ContinueAsComplete" should satisfy the following signature:
             // Signature :
@@ -159,6 +158,7 @@ namespace ParallelPatterns
                     wl => JaroWinklerModule.bestMatchTask(words, wl, threshold)))
                 {
                     matchSet.AddRange(await matchTask);
+                    PrintSummary(matchSet);
                 }
             }
 

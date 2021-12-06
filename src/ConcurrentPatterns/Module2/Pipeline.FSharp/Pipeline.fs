@@ -5,7 +5,7 @@ open System.Linq
 open System.Collections.Concurrent
 open System.Threading
 open System.Threading.Tasks
-
+open Pipeline.FSharp.TaskCompositionEx
 
 module PipelineHelpers =
 
@@ -15,18 +15,9 @@ module PipelineHelpers =
     // convert the F# functions to Func<> using the helper extension method .ToFunc()
     let composeFunc (f1:Func<_, _>) (f2:Func<_, _>) = Func<_,_>(fun x -> f2.Invoke(f1.Invoke(x)))
 
-    let composeTasks (input : Task<'T>) ( binder :Func<'T, Task<'U>>) =
-            let tcs = new TaskCompletionSource<'U>()
-            input.ContinueWith(fun (task:Task<'T>) ->
-               if (task.IsFaulted) then
-                    tcs.SetException(task.Exception.InnerExceptions)
-               elif (task.IsCanceled) then tcs.SetCanceled()
-               else
-                    try
-                       (binder.Invoke(task.Result)).ContinueWith(fun(nextTask:Task<'U>) -> tcs.SetResult(nextTask.Result)) |> ignore
-                    with
-                    | ex -> tcs.SetException(ex)) |> ignore
-            tcs.Task
+    // TODO LAB
+    // be sure have implemented the "SelectMany" task function in the project Common/Helpers.FSharp/TaskExtensions.fs
+    let inline composeTasks (task: Task<'T>) (binder: Func<'T, Task<'U>>) : Task<'U> = (task : Task<'T>).SelectMany(binder)
 
 open PipelineHelpers
 // IPipeline interface
@@ -53,14 +44,15 @@ type Pipeline<'a, 'b> private (func:Func<'a, 'b> option, funcTask:Func<'a, Task<
     let then' (nextFunction:Func<'b,'c>) =
         Pipeline( (Some(composeFunc func nextFunction)), None) :> IPipeline<_,_>
 
-    // TODO (3.a)
     let thenTask (nextFunction:Func<'b, Task<'c>>) =
         let task arg = funcTask.Invoke(arg)
         Pipeline(None, Some(Func<'a, Task<'c>>(fun arg -> composeTasks (task arg) nextFunction))) :> IPipeline<_,_>
 
-    // TODO (3.b)
+    // TODO LAB
     let enqueue (input:'a) (callback:Func<('a * 'b), unit>) =
-        // missing code
+        // TODO complete missing code
+        // We nee to enqueue the input into a callBack
+        // for the collection "continuations" avoiding contentions
         ()
 
     let stop() = for continuation in continuations do continuation.CompleteAdding()
@@ -72,14 +64,14 @@ type Pipeline<'a, 'b> private (func:Func<'a, 'b> option, funcTask:Func<'a, Task<
         for i = 0 to blockingCollectionPoolSize - 1 do
             Task.Factory.StartNew(fun ( )->
                 while (not <| continuations.All(fun bc -> bc.IsCompleted)) && (not <| cancellationToken.IsCancellationRequested) do
-                        
-                    // TODO (3.c)
-                    // step to implement 
-                        // 1 - take an item from the continuations collection 
+
+                    // TODO LAB
+                    // step to implement
+                        // 1 - take an item from the continuations collection
                         // 2 - process the "continuation" function
-                        //     Keep in mind that the continutaion function has both the
-                        //     value and the callback 
-                      
+                        //     Keep in mind that the continuation function has both the
+                        //     value and the callback
+
                     // let continuation = ref Unchecked.defaultof<Continuation<_,_>>
                     ()
             , cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default) |> ignore

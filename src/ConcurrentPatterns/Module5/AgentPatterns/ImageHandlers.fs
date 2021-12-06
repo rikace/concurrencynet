@@ -28,7 +28,7 @@ module Interpolation =
         lerp (lerp c00 c10 tx) (lerp c01 c11 tx) ty
 
     // EXAMPLE : scale image 1.6 1.6
-    // TODO : parallelize
+    // TODO LAB bonus (parallelize this code)
     let scale (self:Image<Rgba32>) (scaleX:float) (scaleY:float) =
         let newWidth  = int ((float self.Width)  * scaleX)
         let newHeight = int ((float self.Height) * scaleY)

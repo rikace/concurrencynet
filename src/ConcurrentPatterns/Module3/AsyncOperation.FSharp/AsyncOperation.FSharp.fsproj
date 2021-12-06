@@ -7,7 +7,6 @@
 
     <ItemGroup>
         <Compile Include="RequestGate.fs" />
-        <None Include="ConcurrentWebCrawling.fsx" />
         <Compile Include="AsyncModule.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>

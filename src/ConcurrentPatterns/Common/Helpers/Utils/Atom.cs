@@ -7,7 +7,7 @@ using System.Threading;
 namespace Helpers
 {
     // Atom object to perform CAS instruction
-    public class Atom<T> where T : class //#A
+    public class Atom<T> where T : class
     {
         public Atom(T value)
         {
@@ -16,9 +16,9 @@ namespace Helpers
 
         protected volatile T value;
 
-        public T Value => value; //#B
+        public T Value => value;
 
-        public virtual T Swap(Func<T, T> operation) //#C
+        public virtual T Swap(Func<T, T> operation)
         {
             T original, temp;
             do
@@ -27,7 +27,7 @@ namespace Helpers
                 temp = operation(original);
             }
 #pragma warning disable 420
-            while (Interlocked.CompareExchange(ref value, temp, original) != original); //#D
+            while (Interlocked.CompareExchange(ref value, temp, original) != original);
 #pragma warning restore 420
             return original;
         }

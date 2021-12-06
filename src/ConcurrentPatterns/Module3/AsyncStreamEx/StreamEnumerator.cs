@@ -82,10 +82,7 @@ namespace AsyncOperations
         public EnumerableStream(Stream stream) => _stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
         public IAsyncEnumerator<byte> GetAsyncEnumerator() => new StreamEnumerator(_stream);
-        public IAsyncEnumerator<byte> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken())
-        {
-            throw new NotImplementedException();
-        }
+        public IAsyncEnumerator<byte> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken()) => new StreamEnumerator(_stream);
     }
 
     public static class StreamExtensions

@@ -18,7 +18,29 @@ namespace GraphTasksConsumer
                 Console.WriteLine($"Starting operation{id} in Thread Id {Thread.CurrentThread.ManagedThreadId}...");
                 await Task.Delay(delay);
             };
+            // TODO complete the missin gparts
+            var dag = new TaskDirectGraphDependencies();
 
+            dag.OperationCompleted += (sender, eventArgs) =>
+            {
+                Console.WriteLine(
+                             $"Operation {eventArgs.Id} completed in Thread Id {Thread.CurrentThread.ManagedThreadId}");
+            };
+
+            dag.AddOperation(1, () => action(1, 600), 4, 5);
+            dag.AddOperation(2, () => action(2, 200), 5);
+            dag.AddOperation(3, () => action(3, 800), 6, 5);
+            dag.AddOperation(4, () => action(4, 500), 6);
+            dag.AddOperation(5, () => action(5, 450), 7, 8);
+            dag.AddOperation(6, () => action(6, 100), 7);
+            dag.AddOperation(7, () => action(7, 900));
+            dag.AddOperation(8, () => action(8, 700));
+            dag.Execute();
+
+            Console.ReadLine();
+
+
+            // F# Parallel Tasks
             // var dagAsync = new ParallelTasksDAG();
             //
             // dagAsync
@@ -37,30 +59,7 @@ namespace GraphTasksConsumer
             // dagAsync.AddTask(8, action(8, 700));
             //
             // dagAsync.ExecuteTasks();
-            //
             // Console.ReadLine();
-
-
-            var dag = new TaskDirectGraphDependencies();
-
-            dag.OperationCompleted += (sender, eventArgs) =>
-            {
-                Console.WriteLine(
-                    $"Operation {eventArgs.Id} completed in Thread Id {Thread.CurrentThread.ManagedThreadId}");
-            };
-
-            dag.AddOperation(1, () => action(1, 600), 4, 5);
-            dag.AddOperation(2, () => action(2, 200), 5);
-            dag.AddOperation(3, () => action(3, 800), 6, 5);
-            dag.AddOperation(4, () => action(4, 500), 6);
-            dag.AddOperation(5, () => action(5, 450), 7, 8);
-            dag.AddOperation(6, () => action(6, 100), 7);
-            dag.AddOperation(7, () => action(7, 900));
-            dag.AddOperation(8, () => action(8, 700));
-            dag.Execute();
-
-            Console.ReadLine();
-
         }
     }
 }

@@ -63,12 +63,12 @@ let processStockHistory symbol = async {
     return (symbol, stockData)
 }
 
-// TODO : 4.9
+// TODO LAB
 // Process the Stock-History analysis for all the stocks in parallel
 let processStockHistoryParallel() =
     let sw = Stopwatch.StartNew()
 
-    // TODO
+    // TODO LAB
     // (1) Process the stock analysis in parallel
     // When all the computation complete, then output the stock details
     // Than control the level of parallelism processing max 2 stocks at a given time
@@ -94,7 +94,7 @@ let processStockHistoryConditional(symbol:string) =
         let downloadStock' = downloadStockHistory symbol
 
 
-        // TODO : 4.8
+        // TODO LAB
         // Take a look at the operators
         // AsyncEx.Retry
         // AsyncEx.Otherwise
@@ -109,9 +109,10 @@ let processStockHistoryConditional(symbol:string) =
         let _stocks = Directory.GetFiles("../../../../../Data/Tickers", "*.csv") // Ok
 
 
-        // TODO : try to control the degree of parallelism,
+        // TODO LAB
+        // try to control the degree of parallelism,
         // "RequestGate" is also a good option, but not the only one
-        // StockAnalyzer/RequestGate.cs
+        // AsyncOperation.FSharp/RequestGate.cs
         ()
 
 let analyzeStockHistory() =

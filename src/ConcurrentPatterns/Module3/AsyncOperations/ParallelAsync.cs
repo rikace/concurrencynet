@@ -61,7 +61,7 @@ namespace AsyncOperations
         {
             // TODO
             //      add a way to throttle/limit the number of concurrent operations
-            //      The RequestGate is a good approach (but not the only one)
+            //      The RequestGate is a good approach (but not the only one, see class ExecuteInWithDegreeOfParallelism.cs)
             var sw = Stopwatch.StartNew();
             var contentTasks = from url in urls
                 select HttpAsync(url);

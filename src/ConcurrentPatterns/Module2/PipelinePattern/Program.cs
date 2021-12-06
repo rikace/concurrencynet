@@ -10,7 +10,7 @@ namespace PipelinePattern
     {
         static void Main(string[] args)
         {
-            var sourceImages = "../../../../../Data/Images"; // OK
+            var sourceImages = "../../../../../Data/Images";
             var destination = "./Images/Output";
             if (!Directory.Exists(destination))
                 Directory.CreateDirectory(destination);

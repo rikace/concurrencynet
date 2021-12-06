@@ -131,10 +131,7 @@ namespace ParallelPatterns
             return PrintSummary(matchSet);
         }
 
-        public static Task<IDictionary<string, HashSet<string>>>
-            RunFuzzyMatchTaskComposition(
-                string[] wordsLookup,
-                IEnumerable<string> files)
+        public static Task<IDictionary<string, HashSet<string>>> RunFuzzyMatchTaskComposition(string[] wordsLookup, IEnumerable<string> files)
         {
             // A better approach is to create a custom operator that preserves
             // the continuation semantic, while handling cases of error, exception and transformation
@@ -143,7 +140,8 @@ namespace ParallelPatterns
             //     Task<TOut> Then<TIn, TOut>(this Task<TIn> task, Func<TIn, Task<TOut>> next)   : Bind
 
             // Traverse the given files in parallel
-            // TODO (1) : Implement a reusable and optimized function called "Then" that satisfied the previous signature
+            // TODO LAB
+            // Implement a reusable and optimized function called "Then" that satisfied the previous signature
             // C# : go to the "Module 1\TaskComposition.cs" and add the missing code in TODO (1)
             // F# : go to the FSharp project "Module 1\TaskComposition.fs" and add the missing code
             //
@@ -195,11 +193,10 @@ namespace ParallelPatterns
 
 
         public static async Task<IDictionary<string, HashSet<string>>>
-            RunFuzzyMatchTaskLINQ(
-                string[] wordsLookup,
-                IEnumerable<string> files)
+            RunFuzzyMatchTaskLINQ(string[] wordsLookup, IEnumerable<string> files)
         {
-            // TODO (2) : After have completed TODO (1), we should be able to implement
+            // TODO LAB
+            // After have completed TODO (1), we should be able to implement
             // effortlessly a LINQ pattern using the Task.
             // Rename the "Then" function implemented with the name SelectMany, such that these three followig signatures
             // are satisfied :
@@ -217,7 +214,7 @@ namespace ParallelPatterns
             //         .Traverse(text =>
             //             WordRegex.Value.Split(text).Where(w => !IgnoreWords.Contains(w)))
             //     let wordSet = words.Flatten().AsSet()
-            //     // TODO (2)
+            //
             //     from bestMatch in wordsLookup.Traverse(wl => JaroWinklerModule.bestMatchTask(wordSet, wl, threshold))
             //     select bestMatch.Flatten());
 

@@ -49,16 +49,11 @@ namespace AkkaFractal.Web.Akka
                 }
             };
 
-
             Action<Completed> complete = _ =>
             {
                 image.Save(destination);
                 Console.WriteLine("Tile render completed");
             };
-
-            Receive<Completed>(complete);
-
-            ReceiveAsync<RenderedTile>(renderedTileAction);
 
             // TODO
             // implement the two Actor Receiver that handle the message types:

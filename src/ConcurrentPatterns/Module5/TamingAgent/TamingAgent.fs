@@ -90,16 +90,15 @@ urls
 |> Seq.sum
 |> (printfn "total size %d")
 
-
 let pipelineAgent l f =
     let a = TamingAgent(l, f)
     fun x -> a.Ask(x)
-    
+
 let retn x = async { return x }
-    
+
 let bind f xAsync = async {
     let! x = xAsync
     return! f x }
-        
-let (>>=) x f = bind f x // async.Bind(x, f)    
-let pipeline agent1 agent2 x = retn x >>= agent1 >>= agent2   
+
+let (>>=) x f = bind f x // async.Bind(x, f)
+let pipeline agent1 agent2 x = retn x >>= agent1 >>= agent2
