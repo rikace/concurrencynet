@@ -66,7 +66,7 @@ namespace ConsoleTaskEx
                 select converted3DImage;
 
             foreach (string fileName in files)
-                // Task Then / SelectMany pieline
+                // Task Then / SelectMany pipeline
                 await transformer(fileName).Then(imageProcessingHelpers.SaveImage_Step4);
 
             // TODO LAB
