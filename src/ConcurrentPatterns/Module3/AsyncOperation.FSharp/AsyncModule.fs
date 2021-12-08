@@ -53,7 +53,7 @@ let httpAsyncThrottle (throttle: int) (url : string) = async {
 
 let runAsyncThrottle () =
     sites
-//    |> Seq.map httpAsync
-   |> Seq.map (httpAsyncThrottle 2)
+    // |> Seq.map httpAsync
+    |> Seq.map (httpAsyncThrottle 2)
     |> Async.Parallel
     |> Async.RunSynchronously
