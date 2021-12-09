@@ -59,7 +59,7 @@ namespace AsyncOperations
 
         public async Task TestHttpAsync()
         {
-            // TODO
+            // TODO LAB
             //      add a way to throttle/limit the number of concurrent operations
             //      The RequestGate is a good approach (but not the only one, see class ExecuteInWithDegreeOfParallelism.cs)
             var sw = Stopwatch.StartNew();

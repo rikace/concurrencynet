@@ -15,7 +15,7 @@ module TaskCompositionEx =
         // implement missing code
         // Use the "TaskCompletionSource<TOut>" object to ease the implementation.
         [<Extension>]
-        static member inline Then (task : Task<'T>,
+        static member Then (input : Task<'T>,
                             binder :Func<'T, Task<'U>>) =
             let tcs = new TaskCompletionSource<'U>()
             // TODO
@@ -25,11 +25,21 @@ module TaskCompositionEx =
             // The idea is to implement an higher order function "Then" that
             // runs the "task" and passes the output type "'T" into the continuation
             // (CPS) function "binder" to map the result into a type "'U"
+            input.ContinueWith(fun (task:Task<'T>) ->
+               if (task.IsFaulted) then
+                    tcs.SetException(task.Exception.InnerExceptions)
+               elif (task.IsCanceled) then tcs.SetCanceled()
+               else
+                    try
+                       (binder.Invoke(task.Result)).ContinueWith(
+                            fun(nextTask:Task<'U>) -> tcs.SetResult(nextTask.Result))
+                       |> ignore
+                    with
+                    | ex -> tcs.SetException(ex)) |> ignore
             tcs.Task
 
         // TODO LAB
         // implement missing code
-        // This is similar implementation of the previous one plus a continuation step
         [<Extension>]
         static member  Then (input : Task<'T>,
                              binder :Func<'T, Task<'U>>,
@@ -45,21 +55,48 @@ module TaskCompositionEx =
         static member Then (input : Task<'T>,
                             binder :Func<'T, 'U>) =
            let tcs = new TaskCompletionSource<'U>()
-            // complete code Missing here
+           input.ContinueWith(fun (task:Task<'T>) ->
+              if task.IsFaulted then
+                   tcs.SetException(task.Exception.InnerExceptions)
+              elif task.IsCanceled then tcs.SetCanceled()
+              else
+                   try
+                       tcs.SetResult(binder.Invoke(task.Result))
+                   with
+                   | ex -> tcs.SetException(ex)) |> ignore
            tcs.Task
 
         [<Extension>]
         static member Select (task : Task<'T>, selector :Func<'T, 'U>) : Task<'U> =
            let r = new TaskCompletionSource<'U>()
-           // implement missing code
-           // YOU CAN REPLACE THE "TASK THEN" IMPLEMENTATION
+           task.ContinueWith(fun (t:Task<'T>) ->
+               if t.IsFaulted then r.SetException(t.Exception.InnerExceptions)
+               elif t.IsCanceled then r.SetCanceled()
+               else r.SetResult(selector.Invoke(t.Result));
+               selector.Invoke(t.Result)
+           ) |> ignore
            r.Task
 
         [<Extension>]
         static member SelectMany (input : Task<'T>, binder : Func<'T, Task<'U>>) =
            let tcs = new TaskCompletionSource<'U>()
-           // implement missing code
-           // YOU CAN REPLACE THE "TASK THEN" IMPLEMENTATION
+           input.ContinueWith(fun (task:Task<'T>) ->
+              if task.IsFaulted then
+                   tcs.SetException(task.Exception.InnerExceptions)
+              elif task.IsCanceled then tcs.SetCanceled()
+              else
+                   try
+                       let t = binder.Invoke(task.Result)
+                       if t = null then tcs.SetCanceled()
+                       else
+                           t.ContinueWith(fun(nextT:Task<'U>) ->
+                               if nextT.IsFaulted then tcs.TrySetException(nextT.Exception.InnerExceptions);
+                               elif nextT.IsCanceled then tcs.TrySetCanceled()
+                               else tcs.TrySetResult(nextT.Result);
+                           , TaskContinuationOptions.ExecuteSynchronously)
+                           |> ignore
+                   with
+                   | ex -> tcs.SetException(ex)) |> ignore
            tcs.Task
 
         [<Extension>]

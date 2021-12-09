@@ -29,11 +29,18 @@ namespace BenchmarkParallelPatterns
         [Benchmark]
         public double ParallelForMonteCarlo() => PiMontecarlo.ParallelForCalculate(iterations);
 
-         [Benchmark]
-         public double ParallelPiMonteCarlo() => PiMontecarlo.ParallelPiMonteCarlo(iterations);
+        [Benchmark]
+        public double ParallelPiMonteCarlo() => PiMontecarlo.ParallelPiMonteCarlo(iterations);
 
-         [Benchmark]
-         public double PLINQPartitionerMonteCarlo() => PiMontecarlo.PLINQPartitionerCalculate(iterations);
+        [Benchmark]
+        public double ParallelForThreadLocalMonteCarlo() => PiMontecarlo.ParallelForThreadLocalCalculate(iterations);
+
+        [Benchmark]
+        public double PLINQMonteCarlo() => PiMontecarlo.PLINQCalculate(iterations);
+
+        [Benchmark]
+        public double PLINQPartitionerMonteCarlo() => PiMontecarlo.PLINQPartitionerCalculate(iterations);
+
     }
 
 

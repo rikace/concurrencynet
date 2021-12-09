@@ -91,6 +91,28 @@ namespace ParallelPatterns
             int inCircle = 0;
             var random = new Helpers.ThreadSafeRandom();
 
+            // TODO
+            Parallel.For(0, iterations,
+                new ParallelOptions() {MaxDegreeOfParallelism = Environment.ProcessorCount},
+                (iter) =>
+                {
+                    var a = random.NextDouble();
+                    var b = random.NextDouble();
+                    var subTotal = Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1
+                        ? 1
+                        : 0;
+                    Interlocked.Add(ref inCircle, subTotal);
+                });
+
+            return ((double) inCircle / iterations) * 4;
+        }
+
+
+        public static double ParallelForThreadLocalCalculate(int iterations)
+        {
+            int inCircle = 0;
+            var random = new Helpers.ThreadSafeRandom();
+
             // Parallel.For/Foreach  + ThreadLocal + CAS
 
             // TODO LAB
@@ -105,6 +127,18 @@ namespace ParallelPatterns
             // UNCOMMENT : Parallel.For(0, iterations,
             //             name of ThreadLocal variable "tLocal
 
+            // TODO LAB
+            Parallel.For(0, iterations,
+                // doesn't make sense to use more threads than we have processors
+                new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount },
+                () => 0, (i, _, tLocal) =>
+                {
+                    double a, b;
+                    return tLocal += Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1
+                        ? 1
+                        : 0;
+                },
+                subTotal => Interlocked.Add(ref inCircle, subTotal));
 
             return ((double) inCircle / iterations) * 4;
         }
@@ -136,7 +170,10 @@ namespace ParallelPatterns
         {
             var random = new Helpers.ThreadSafeRandom();
 
-                var inCircle = ParallelEnumerable.Range(0, iterations)
+            // Solutions
+            var inCircle = Partitioner.Create(0, iterations).AsParallel()
+
+                //var inCircle = ParallelEnumerable.Range(0, iterations)
                 // doesn't make sense to use more threads than we have processors
                 .WithDegreeOfParallelism(Environment.ProcessorCount)
                 .Select(_ =>
@@ -149,6 +186,14 @@ namespace ParallelPatterns
             // TODO LAB
             // Use the previous implementation from "PLINQCalculate", in this case
             // apply a "Partitioner" to improve the performance
+
+			/* Solutions
+			                .Aggregate<bool, int, int>(
+                    0, // Seed
+                    (agg, val) => val ? agg + 1 : agg, // Iterations
+                    (agg, subTotal) => agg + subTotal, // Aggregating subtotals
+                    result => result); // No projection of result needed
+  */
 
             return ((double) inCircle / iterations) * 4;
         }

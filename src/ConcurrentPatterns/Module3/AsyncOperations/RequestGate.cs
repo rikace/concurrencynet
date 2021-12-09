@@ -16,21 +16,31 @@ namespace AsyncOperations
         public async Task<IDisposable> AsyncAcquire(TimeSpan timeout,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            // TODO
+            // TODO LAB
             // implement the logic to coordinate the access to resources
             // using "semaphore". Keep async semantic for the "acquire" and "release" of the handle
             // throw new Exception("No implemented");
             //
             // Note: the "SemaphoreSlimRelease" class could help with the implementation
 
-
+            //throw new Exception("couldn't acquire a semaphore");
+            var ok = await semaphore.WaitAsync(timeout, cancellationToken);
+            if (ok)
+            {
+                Thread.BeginCriticalRegion();
+                return new SemaphoreSlimRelease(semaphore);
+            }
             throw new Exception("couldn't acquire a semaphore");
         }
-
         private class SemaphoreSlimRelease : IDisposable
         {
+            SemaphoreSlim semaphore;
+            public SemaphoreSlimRelease(SemaphoreSlim semaphore) => this.semaphore = semaphore;
             public void Dispose()
-            { }
+            {
+                Thread.EndCriticalRegion();
+                semaphore.Release();
+            }
         }
     }
 }

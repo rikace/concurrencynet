@@ -40,20 +40,29 @@ namespace StockAnalyzer
             // Than control the level of parallelism processing max 2 stocks at a given time
             // Suggestion, use the RequestGate class (and/or ExecuteInWithDegreeOfParallelism class)
 
+            //List<Task<Tuple<string, StockData[]>>> stockHistoryTasks = Stocks.Select(ProcessStockHistory).ToList();
+
+            // TODO LAB
+            // Tuple<string, StockData[]>[] stockHistoryTasks =
+            //     // TODO RT execute in parallel
+            //     await StockUtils.Stocks.ExecuteInParallel(symbol => ProcessStockHistoryBind(symbol, cTok), 2);
+
             // TODO LAB
             List<Tuple<string, StockData[]>> stockHistoryTasks = new List<Tuple<string, StockData[]>>();
+                // TODO RT execute in parallel
+                //await StockUtils.Stocks.ExecuteInParallel(symbol => ProcessStockHistoryBind(symbol, cTok), 2);
 
-            // TODO: execute in parallel to generate the "stockHistoryTasks" using the function
-            // - ProcessStockHistoryBind(symbol, cTok)
-            // NOTE: control the level of parallelism processing max 2 stocks at a given time using the "ExecuteInWithDegreeOfParallelism.ExecuteInParallel" function
+            var gate = new AsyncOperations.RequestGate(2);
 
             foreach (var symbol in stockSymbols)
             {
-                // NOTE: control the level of parallelism processing max 2 stocks at a given time
-                // Suggestion, use the RequestGate class
-
-                var stockHistory = await ProcessStockHistoryBind(symbol, cTok);
-                stockHistoryTasks.Add(stockHistory);
+                // TODO Found the error (add await)
+                using (var _ = gate.AsyncAcquire(TimeSpan.FromSeconds(1)))
+                {
+                    // async operation
+                    var stockHistory = await ProcessStockHistoryBind(symbol, cTok);
+                    stockHistoryTasks.Add(stockHistory);
+                }
             }
 
             DisplayStockInfos(stockHistoryTasks);

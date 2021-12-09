@@ -34,12 +34,33 @@ namespace Helpers
 
             // TODO (3.a)
             int prevIndex = -1;
+            Action<Task<R>> continuation = completedTask =>
+            {
+                int index = Interlocked.Increment(ref prevIndex);
+                var source = completionSourceList[index];
 
+                switch (completedTask.Status)
+                {
+                    case TaskStatus.Canceled:
+                        source.TrySetCanceled();
+                        break;
+                    case TaskStatus.Faulted:
+                        source.TrySetException(completedTask.Exception.InnerExceptions);
+                        break;
+                    default:
+                        source.TrySetResult(completedTask.Result);
+                        break;
+                }
+            };
 
+            // TODO complete this code
+            // inputTask.ContinueWith
             foreach (var inputTask in inputTaskList)
             {
-                // TODO complete this code
-                // inputTask.ContinueWith
+                inputTask.ContinueWith(continuation,
+                    CancellationToken.None,
+                    TaskContinuationOptions.ExecuteSynchronously,
+                    TaskScheduler.Default);
             }
 
             return completionSourceList.Select(source => source.Task);

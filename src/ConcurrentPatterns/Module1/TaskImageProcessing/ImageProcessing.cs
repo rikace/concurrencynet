@@ -33,11 +33,14 @@ namespace ConsoleTaskEx
             foreach (string fileName in files)
             {
                 await imageProcessingHelpers.LoadImage_Step1(fileName)
+                    .ContinueWith(imageInfo =>
+                    {
                         // TODO LAB
                         // how can we implement an helper function to use/re-use to handle both
                         // task Error and task Cancellation (in a centralize manner)
-                    .ContinueWith(imageInfo => imageProcessingHelpers.ScaleImage_Step2(imageInfo.Result)).Unwrap()
-                    .ContinueWith(imageInfo => imageProcessingHelpers.ConvertTo3D_Step3(imageInfo.Result)).Unwrap()
+                        return imageProcessingHelpers.ScaleImage_Step2(imageInfo.Result);
+                    }).Unwrap()
+                    .ContinueWith(imageInfo => { return imageProcessingHelpers.ConvertTo3D_Step3(imageInfo.Result); }).Unwrap()
                     .ContinueWith(imageInfo => { imageProcessingHelpers.SaveImage_Step4(imageInfo.Result); });
             }
         }
@@ -69,11 +72,14 @@ namespace ConsoleTaskEx
                 // Task Then / SelectMany pipeline
                 await transformer(fileName).Then(imageProcessingHelpers.SaveImage_Step4);
 
-            // TODO LAB
-            // execute "transformer" operations in parallel (Option using Task.WhenAll)
-            // NOTE: we should Throttle the task, how can we control the number of tasks run in parallel?
-            //       - Option using Task.WhenAll
-            //       - Throttle the tasks
+                // Option using Task.WhenAll
+                //await transformer(fileName).SelectMany(imageProcessingHelpers.SaveImage_Step4);
+
+                // TODO LAB
+                // execute "transformer" operations in parallel (Option using Task.WhenAll)
+                // NOTE: we should Throttle the task, how can we control the number of tasks run in parallel?
+                //       - Option using Task.WhenAll
+                //       - Throttle the tasks
 
         }
     }

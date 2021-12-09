@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using CommonHelpers;
+using CSharpWebCrawler;
 using ParallelForkJoin;
 using static Helpers.Helpers;
 using FileEx = Helpers.FileEx;
@@ -17,7 +18,7 @@ namespace DataFlowPipeline
     {
         static async Task Main(string[] args)
         {
-            var files = Directory.GetFiles("./../../../../Data/Text", "*.txt");
+            //var files = Directory.GetFiles("./../../../../Data/Text", "*.txt");
 
             var cts = new CancellationTokenSource();
 
@@ -52,7 +53,7 @@ namespace DataFlowPipeline
 
             string baseFolderName = @"./Images";
 
-            DataflowReactive.DataFlowCrawler.Start(urls, async (url, buffer) =>
+            DataFlowCrawler.Start(urls, 4, async (url, buffer) =>
             {
                 string fileName = Path.GetFileNameWithoutExtension(Path.GetTempFileName()) + ".jpg";
 

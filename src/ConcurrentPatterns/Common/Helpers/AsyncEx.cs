@@ -12,20 +12,18 @@ namespace Functional.Async
         public static Task<T> Return<T>(T task) => Task.FromResult(task);
 
         public static async Task<R> Bind<T, R>(this Task<T> task, Func<T, Task<R>> continuation)
-            =>
+            => await continuation(await task.ConfigureAwait(false)).ConfigureAwait(false);
                 // TODO
                 // Implement the Bind function using a  continuation programming style CPS
                 // passing the result of the primary "task" (T) into the "continuation" function
                 // that return a delegate with output a new Task type "Task<R>"
                 // The async operation should flow without blocking
-                default;
 
         public static async Task<R> Map<T, R>(this Task<T> task, Func<T, R> projection)
-            =>
+            => projection(await task.ConfigureAwait(false));
                 // TODO
                 // Implement the MAP function using a simple projection T -> R
                 // The async operation should flow without blocking
-                default;
 
         public static async Task<R> SelectMany<T, R>(this Task<T> task,
             Func<T, Task<R>> then) => await Bind(task, then);

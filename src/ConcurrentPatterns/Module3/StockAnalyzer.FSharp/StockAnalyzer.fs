@@ -90,7 +90,7 @@ let processStockHistoryConditional(symbol:string) =
         // googleService
         let downloadStock = downloadStockHistory symbol
 
-        // implement a service that dowloads the symbol history from Yahoo
+        // implement a service that downloads the symbol history from Yahoo
         let downloadStock' = downloadStockHistory symbol
 
 

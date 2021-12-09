@@ -26,10 +26,16 @@ namespace StockAnalyzer
             // Process the Task using the function "DisplayStockInfo"
             while (stockHistoryTasks.Count > 0)
             {
-                // Delay for Demo purpose
-                await Task.Delay(500);
+                Task<Tuple<string, StockData[]>> stockHistoryTask =
+                    await Task.WhenAny(stockHistoryTasks);
 
-                // DisplayStockInfo( < result from the task here > );
+                stockHistoryTasks.Remove(stockHistoryTask);
+
+                Tuple<string, StockData[]> stockHistory = await stockHistoryTask;
+
+               await Task.Delay(500);
+
+                DisplayStockInfo(stockHistory);
             }
         }
     }

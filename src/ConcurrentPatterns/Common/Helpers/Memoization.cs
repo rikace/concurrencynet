@@ -19,23 +19,31 @@ namespace ConcurrentPatterns
             };
         }
 
-        // TODO RT
+        // TODO LAB
         // (1) Implement Thread-safe memoization function
         // (2) Optionally, implement memoization with Lazy behavior
 
         // Thread-safe memoization function
         public static Func<T, R> MemoizeThreadSafe<T, R>(Func<T, R> func) where T : IComparable
         {
-            return default;
+            ConcurrentDictionary<T, R> cache = new ConcurrentDictionary<T, R>();
+            return arg => cache.GetOrAdd(arg, a => func(a));
         }
 
-        // TODO RT
+        public static Func<T, R> MemoizeLazyThreadSafe<T, R>(Func<T, R> func) where T : IComparable
+        {
+            ConcurrentDictionary<T, Lazy<R>> cache = new ConcurrentDictionary<T, Lazy<R>>();
+            return arg => cache.GetOrAdd(arg, a => new Lazy<R>(() => func(a))).Value;
+        }
+
+        // TODO LAB
         // Thread-Safe Memoization function with safe lazy evaluation
         // (1) Implement Thread-safe memoization function
         // (2) Optionally, implement memoization with Lazy behavior
         public static Func<T, Task<R>> MemoizeThreadSafe<T, R>(Func<T, Task<R>> func) where T : IComparable
         {
-            return default;
+            ConcurrentDictionary<T, Lazy<Task<R>>> cache = new ConcurrentDictionary<T, Lazy<Task<R>>>();
+            return arg => cache.GetOrAdd(arg, a => new Lazy<Task<R>>(() => func(a))).Value;
         }
     }
 }
