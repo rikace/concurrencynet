@@ -25,11 +25,15 @@ namespace AkkaFractal.Web.Akka
 
             int count = 0;
 
-            Func<RenderedTile, Task> renderedTileAction = async tile =>
+            // TODO LAB
+            // the method "renderedTileAction" is synchronous, however the internal
+            // method "SendEventAsync" is Asynchronous.
+            // Convert this functions to be truth Asynchronous
+            Action<RenderedTile> renderedTileAction = tile =>
             {
                 var sseTile = new SseFormatTile(tile.X, tile.Y, Convert.ToBase64String(tile.Bytes));
                 var text = JsonConvert.SerializeObject(sseTile);
-                await serverSentEventsService.SendEventAsync(text);
+                serverSentEventsService.SendEventAsync(text);
 
                 Console.WriteLine($"Received Message {++count}");
 

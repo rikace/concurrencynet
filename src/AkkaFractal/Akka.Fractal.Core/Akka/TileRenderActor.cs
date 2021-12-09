@@ -9,7 +9,9 @@ namespace AkkaFractal.Core.Akka
     {
         public TileRenderActor()
         {
+
             Receive<Completed>(c => Sender.Tell(c));
+
 
             Receive<RenderTile>(render =>
             {
@@ -19,7 +21,9 @@ namespace AkkaFractal.Core.Akka
                     render.X, render.Y, render.Width, render.Height,
                     render.ImageWidth, render.ImageHeight, 0.5, -2.5, 1.5, -1.5);
 
-                Sender.Tell(new RenderedTile(render.X, render.Y, res.ToByteArray()));
+                // TODO LAB
+                // Complete this e "R Receive<RenderTile>" handler so that it responds back (reply)
+                // to the sender a "RenderedTile" message with the correct parameters
             });
         }
 

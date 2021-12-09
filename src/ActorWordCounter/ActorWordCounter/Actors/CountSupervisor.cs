@@ -44,7 +44,7 @@ namespace ActorMapReduceWordCount.Actors
             // Then
                 //
                 // (1) Create a child reader actor (LineReaderActor) using the current Context.
-                // To instantiate an actor you should use a "Props".
+                // To instantiate an actor you should use a "Props" helper class.
                 // for true parallelism, instantiate the actor using a Pool that load-balance
                 // the work across the actor-children.
 

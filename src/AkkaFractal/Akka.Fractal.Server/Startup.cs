@@ -58,8 +58,12 @@ namespace Akka.Fractal.Server
                 // TODO
                 // create the instantiation of the "tileRenderActor" using the "TileRenderActor" actor.
                 // After the first successful run, increase the level of parallelism using either a
-                // Pool routing that distributes the work across its children (routee), or modifying the
+                // Pool routing strategy that distributes the work across its children (routee), or modifying the
                 // HOCON config (akka.conf) file section "remoteactor"
+                //
+                // NOTE: to run a Remote Actor-System and sen messages to an Actor cross-process,
+                //       you should "Remote deploy" this actor. Check the "Akka.conf" in the "Akka.Fractal.Remote" project
+                //       for some details.
                 //
                 //  Following code has to be update with the correct implementation
                 var tileRenderActor = Nobody.Instance;
@@ -69,7 +73,7 @@ namespace Akka.Fractal.Server
                 // create the instantiation of the "sseTileActor" using the "SseTileActor" actor
                 // passing the correct argument in the constructor
                 //
-                //  Following code has to be update with the correct implementation
+                //  Th following code has to be updated with the correct implementation
                 var sseTileActor = Nobody.Instance;
 
 
