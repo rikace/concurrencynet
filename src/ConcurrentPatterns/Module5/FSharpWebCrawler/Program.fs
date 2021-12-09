@@ -1,10 +1,12 @@
 ﻿open System
 open FSharpWebCrawler
+open AgentWebCrawler.WebCrawler
 
 [<EntryPoint>]
 let main argv =
 
-    let agent = new AgentWebCrawler.ParallelWebCrawler.WebCrawler(4)
+
+    let agent = new ParallelWebCrawler.WebCrawler(4)
 
     agent.Submit "https://www.google.com"
 

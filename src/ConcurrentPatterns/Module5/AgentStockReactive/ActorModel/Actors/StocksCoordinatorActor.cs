@@ -27,10 +27,12 @@ namespace ReactiveStock.ActorModel.Actors
             {
                 switch (message)
                 {
-                    // TODO LAB
-                    // the "message" is a stock symbol to either register or unregister the "Watch".
-                    // Implement the logic to handle the message based on its type.
-
+                    case WatchStockMessage msg:
+                        WatchStock(msg);
+                        break;
+                    case UnWatchStockMessage msg:
+                        UnWatchStock(msg);
+                        break;
                     default:
                         throw new ArgumentException(
                             message: "message is not a recognized",
@@ -45,7 +47,21 @@ namespace ReactiveStock.ActorModel.Actors
             // (1) check if the "StockSymbol" value in the message already exists in the current state, otherwise
             //     create a new Agent "StockActor" and add the new record to the "stockActors" state.
             // (2) Notify the Agent "chartingActor" to add a new Chart for the new Symbol
+            bool childActorNeedsCreating = !_stockActors.ContainsKey(message.StockSymbol);
+
+            if (childActorNeedsCreating)
+            {
+                var newChildActor =
+                    StockActor.Create(message.StockSymbol);
+
+                _stockActors.Add(message.StockSymbol, newChildActor);
+            }
+
+            _chartingActor.Post(new AddChartSeriesMessage(message.StockSymbol, message.Color));
+
             // (3) Send a "SubscribeToNewStockPricesMessage" message to the new Agent created
+            _stockActors[message.StockSymbol]
+                .Post(new SubscribeToNewStockPricesMessage(_chartingActor));
         }
 
         private void UnWatchStock(UnWatchStockMessage message)
@@ -53,7 +69,16 @@ namespace ReactiveStock.ActorModel.Actors
             // TODO LAB
             // (1) Check and remove Agent related to the "StockSymbol" value in the message from the current state
             // (2) Notify the Agent "chartingActor" to remove the Chart related to the Symbol in the message
+            if (!_stockActors.ContainsKey(message.StockSymbol))
+            {
+                return;
+            }
+
+            _chartingActor.Post(new RemoveChartSeriesMessage(message.StockSymbol));
+
             // (3) Send a "UnSubscribeFromNewStockPricesMessage" message to the Agent removed from the current state
+            _stockActors[message.StockSymbol]
+                .Post(new UnSubscribeFromNewStockPricesMessage(_chartingActor));
         }
     }
 }

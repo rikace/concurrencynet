@@ -72,8 +72,12 @@ namespace DataflowPipeline
             // TODO LAB
             // Link the block to form the correct pipeline shape
             // for the word-counter
-
+            downloadBook.LinkTo(createWordList);
+            createWordList.LinkTo(filterWordList);
             // TODO LAB
+            // Remove this step and replace with RX
+            filterWordList.LinkTo(printWordCount);
+
             // use Reactive/Extensions (Observable) in the last step of the pipeline
             // - Register the output of the last Dataflow block as Observable
             // - Create an Observable step to maintain the state of the outputs in a collection
@@ -86,13 +90,31 @@ namespace DataflowPipeline
             //       A completed dataflow block processes any buffered elements, but does
             //       not accept new elements.
 
+            // TODO LAB
             // Add missing code here
 
             // ...
+            downloadBook.LinkTo(createWordList);
+            createWordList.LinkTo(broadcast);
+            broadcast.LinkTo(filterWordList);
+            broadcast.LinkTo(accumulator);
+            filterWordList.LinkTo(printWordCount);
 
+            accumulator
+                .AsObservable()
+
+                .Scan(new HashSet<string>(),
+                    (state, words) =>
+                {
+                    state.AddRange(words);
+                    return state;
+                })
+                .Subscribe(words =>
+                    Console.WriteLine("Observable -> Found {0} words", words.Count));
 
             try
             {
+
                 downloadBook.Completion.ContinueWith(t =>
                 {
                     if (t.IsFaulted) ((IDataflowBlock) createWordList).Fault(t.Exception);
@@ -119,6 +141,9 @@ namespace DataflowPipeline
 
                 // Mark the head of the pipeline as complete.
                 downloadBook.Complete();
+
+                printWordCount.Completion.Wait();
+                // TODO LAB
                 printWordCount.Completion.Wait(cTok);
 
                 Console.WriteLine("Finished. Press any key to exit.");
