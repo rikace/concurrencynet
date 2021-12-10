@@ -73,7 +73,10 @@ let filterImages = async {
  //     look how the previous functions "filterImages" and "scaleImages" are implemented
 let saveImages = async {
     while not cts.IsCancellationRequested do
-        () // replace this () unit with the missing implementation
+        let! info = filteredImages.AsyncDequeue()
+        printfn "saving %s"  info.Name
+        info.Image.Save(info.Destination)
+        info.Image.Dispose()
 }
 
 // TODO LAB
@@ -81,7 +84,8 @@ let saveImages = async {
  //     run all the steps previously implemented
  //     loadImages, scaleImages, filterImages, saveImages
 
-// TODO LAB bonus
-// it seems that the step functions "filterImages", "filterImages"... have similarities.
-// Implement a reusable and generic higher order function that we can use to replace those step functions
-let start() = ()
+let start() =
+    Async.Start(loadImages, cts.Token)
+    Async.Start(scaleImages, cts.Token)
+    Async.Start(filterImages, cts.Token)
+    Async.Start(saveImages, cts.Token)

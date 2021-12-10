@@ -12,7 +12,7 @@ namespace AsyncOperations
     public static class ThrottleAsyncOperations
     {
         // Download an image(icon) from the network asynchronously
-        private static async Task DownloadSiteIconAsync(string url, string fileDestination)
+        public static async Task DownloadSiteIconAsync(string url, string fileDestination)
         {
             // TODO check the implementations of Bind Map Tap
             using (FileStream stream = new FileStream(fileDestination,
@@ -36,8 +36,8 @@ namespace AsyncOperations
                 select DownloadSiteIconAsync(url,
                     $"./Images/Output/{Guid.NewGuid().ToString("N")}.jpg"));
 
-            // TODO ensure that the tasks run in parallel
-            // TODO wait for all the tasks to complete
+            // ensure that the tasks run in parallel
+            // wait for all the tasks to complete
 
             Console.WriteLine("All icons downloaded!");
         }

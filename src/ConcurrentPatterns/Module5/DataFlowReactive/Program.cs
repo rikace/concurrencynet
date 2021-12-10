@@ -73,9 +73,10 @@ namespace DataFlowPipeline
             Console.ReadKey();
         }
 
-        static Task TestForkJoin(IEnumerable<string> files)
+        static async Task TestForkJoin(IEnumerable<string> files)
         {
-            var result = ForkJoinDataFlow.ForkJoin<string, string, ConcurrentDictionary<string, int>>(files,
+            var result = await ForkJoinDataFlow.ForkJoin<string, string, ConcurrentDictionary<string, int>>(
+                files,
                 file => FileEx.ReadAllLinesAsync(file),
                 () => new ConcurrentDictionary<string, int>(),
                 (state, line) =>
@@ -90,7 +91,13 @@ namespace DataFlowPipeline
 
                     return state;
                 });
-            return result;
+
+            foreach (var item in result)
+            {
+                Console.WriteLine($"The word {item.Key} was mentioned {item.Value}");
+            }
+
+
         }
     }
 }

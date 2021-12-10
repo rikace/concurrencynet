@@ -61,7 +61,26 @@ namespace ActorMapReduceWordCount.Actors
 
                 // CODE HERE
 
+                #region  Solution
+                var lineReader = Context.ActorOf(new RoundRobinPool(_numberOfRoutees)
+                                    .Props(LineReaderActor.Create(writer)));
 
+
+
+                using (var reader = fileInfo.OpenText())
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        lineNumber++;
+
+                        var line = reader.ReadLine();
+                        lineReader.Tell(new ReadLineForCounting(lineNumber, line));
+                    }
+                }
+
+                lineReader.Tell(new Broadcast(new Complete()));
+                #endregion
+            });
 
             Receive<MappedList>(msg =>
             {

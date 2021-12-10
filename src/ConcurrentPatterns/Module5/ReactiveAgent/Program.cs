@@ -17,7 +17,7 @@ namespace ReactiveAgent.CS
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
 
             // TODO LAB

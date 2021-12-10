@@ -41,7 +41,11 @@ namespace Reactive
             // to the subscriber ("Pong") every 1 second
             // Suggestion, the trick is to send to the observer a message
             // that contains this instance of PING
-            return null;
+            return Observable.Interval(TimeSpan.FromSeconds(2))
+                .Where(n => n < 10)
+                .Select(n => this)
+                .Subscribe(observer);
+
         }
         // Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         public void Dispose()
@@ -50,7 +54,8 @@ namespace Reactive
         }
     }
 
-    // TODO implement the interface "ISubject<Ping, Pong>"
+    // TODO LAB
+    // implement the interface "ISubject<Ping, Pong>"
     // public class Pong : ISubject<Ping, Pong>
     public class Pong : ISubject<Ping, Pong>
     {
@@ -76,12 +81,17 @@ namespace Reactive
         // Subscribes an observer to the observable sequence.
         public IDisposable Subscribe(IObserver<Pong> observer)
         {
-		    // TODO
+		    // TODO LAB
             // implement an Observable timer that sends a notification
             // to the subscriber ("Ping") every 1.5 second
             // Suggestion, the trick is to send to the observer a message
             // that contains this instance of PONG
-            return null;
+
+            return Observable.Interval(TimeSpan.FromSeconds(1.5))
+                .Where(n => n < 10)
+                .Select(n => this)
+                .Subscribe(observer);
+
         }
 
         // Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

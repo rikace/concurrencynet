@@ -5,7 +5,7 @@ open System.Linq
 open System.Collections.Concurrent
 open System.Threading
 open System.Threading.Tasks
-open Pipeline.FSharp.TaskCompositionEx
+
 
 module PipelineHelpers =
 
@@ -17,7 +17,18 @@ module PipelineHelpers =
 
     // TODO LAB
     // be sure have implemented the "SelectMany" task function in the project Common/Helpers.FSharp/TaskExtensions.fs
-    let inline composeTasks (task: Task<'T>) (binder: Func<'T, Task<'U>>) : Task<'U> = (task : Task<'T>).SelectMany(binder)
+    let composeTasks (input : Task<'T>) ( binder :Func<'T, Task<'U>>) =
+            let tcs = new TaskCompletionSource<'U>()
+            input.ContinueWith(fun (task:Task<'T>) ->
+               if (task.IsFaulted) then
+                    tcs.SetException(task.Exception.InnerExceptions)
+               elif (task.IsCanceled) then tcs.SetCanceled()
+               else
+                    try
+                       (binder.Invoke(task.Result)).ContinueWith(fun(nextTask:Task<'U>) -> tcs.SetResult(nextTask.Result)) |> ignore
+                    with
+                    | ex -> tcs.SetException(ex)) |> ignore
+            tcs.Task
 
 open PipelineHelpers
 // IPipeline interface
@@ -44,6 +55,7 @@ type Pipeline<'a, 'b> private (func:Func<'a, 'b> option, funcTask:Func<'a, Task<
     let then' (nextFunction:Func<'b,'c>) =
         Pipeline( (Some(composeFunc func nextFunction)), None) :> IPipeline<_,_>
 
+    // TODO LAB
     let thenTask (nextFunction:Func<'b, Task<'c>>) =
         let task arg = funcTask.Invoke(arg)
         Pipeline(None, Some(Func<'a, Task<'c>>(fun arg -> composeTasks (task arg) nextFunction))) :> IPipeline<_,_>
@@ -67,7 +79,7 @@ type Pipeline<'a, 'b> private (func:Func<'a, 'b> option, funcTask:Func<'a, Task<
 
                     // TODO LAB
                     // step to implement
-                        // 1 - take an item from the continuations collection
+                        // 1 - take an item from the continuations collection (each item / for-loop)
                         // 2 - process the "continuation" function
                         //     Keep in mind that the continuation function has both the
                         //     value and the callback

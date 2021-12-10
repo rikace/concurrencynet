@@ -30,9 +30,8 @@ namespace Helpers
             // Suggestion, the TaskCompletionSource (or a collection) is a good alternative
 
             // TODO LAB
-            Action<Task<R>> continuataion = null;  // replace "null" with missing code here
+            Action<Task<R>> continuataion = null; // replace "null" with missing code here
 
-            // TODO (3.a)
             int prevIndex = -1;
             Action<Task<R>> continuation = completedTask =>
             {

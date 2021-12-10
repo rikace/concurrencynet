@@ -65,7 +65,7 @@ module ``Composing TamingAgent with Kleisli operator example`` =
     let apply3DEffectAgent = pipe 2 apply3D
     let saveImageAgent = pipe 2 saveImage
 
-    // Demo 6.11
+    // Demo
     // >=>
     let pipeline = loadImageAgent >=> apply3DEffectAgent >=> saveImageAgent
 
@@ -81,7 +81,7 @@ let main argv =
 
     ``TamingAgent example``.transformImages()
 
-    // ``Composing TamingAgent with Kleisli operator example``.transformImages();
+    ``Composing TamingAgent with Kleisli operator example``.transformImages();
 
     Console.ReadLine() |> ignore
     0

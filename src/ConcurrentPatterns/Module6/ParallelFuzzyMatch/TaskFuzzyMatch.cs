@@ -131,7 +131,10 @@ namespace ParallelPatterns
             return PrintSummary(matchSet);
         }
 
-        public static Task<IDictionary<string, HashSet<string>>> RunFuzzyMatchTaskComposition(string[] wordsLookup, IEnumerable<string> files)
+        public static Task<IDictionary<string, HashSet<string>>>
+            RunFuzzyMatchTaskComposition(
+                string[] wordsLookup,
+                IEnumerable<string> files)
         {
             // A better approach is to create a custom operator that preserves
             // the continuation semantic, while handling cases of error, exception and transformation
@@ -193,7 +196,9 @@ namespace ParallelPatterns
 
 
         public static async Task<IDictionary<string, HashSet<string>>>
-            RunFuzzyMatchTaskLINQ(string[] wordsLookup, IEnumerable<string> files)
+            RunFuzzyMatchTaskLINQ(
+                string[] wordsLookup,
+                IEnumerable<string> files)
         {
             // TODO LAB
             // After have completed TODO (1), we should be able to implement

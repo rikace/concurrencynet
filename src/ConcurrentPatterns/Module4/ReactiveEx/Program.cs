@@ -7,7 +7,6 @@ namespace ReactiveEx
     {
         static void Main(string[] args)
         {
-            // TODO / DEMO
             // AsyncToObservable.Start();
 
             var ping = new Ping();
@@ -15,12 +14,18 @@ namespace ReactiveEx
 
             // TODO LAB
             // register the Ping and Pong (Observable/Observer) to each other
+            // var pongSubscription
+            // var pingSubscription
+
+
+            var pongSubscription = ping.Subscribe(pong);
+            var pingSubscription = pong.Subscribe(ping);
 
             Console.WriteLine("Press any key to stop ...");
             Console.ReadKey();
 
-            // TODO LAB
-            // Close / Unregister the Ping and Pong registrations
+            pongSubscription.Dispose();
+            pingSubscription.Dispose();
 
             Console.WriteLine("Ping Pong has completed.");
         }

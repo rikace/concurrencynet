@@ -19,6 +19,14 @@ namespace ReactiveStockTickers
         private List<T> _data;
         private Func<string, T> _map;
 
+        private async IAsyncEnumerable<string> ReadAllLinesAsync(string filePath)
+        {
+            using FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite,
+                0x1000, true);
+            using StreamReader reader = new StreamReader(stream);
+            while(!reader.EndOfStream)
+                yield return await reader.ReadLineAsync();
+        }
         // TODO convert to IAsyncEnumerable
         public IEnumerable<T> GetLines()
         {

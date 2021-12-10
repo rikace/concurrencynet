@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
+using AsyncOperations;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
@@ -84,9 +84,15 @@ namespace StockAnalyzer
         /// Process a set of Stocks downloading the stocks info from "alphavantage" website
         public static async Task ProcessStockHistoryParallel(IEnumerable<string> stockSymbols, CancellationToken cTok)
         {
+            var requestGate = new RequestGate(4);
+
             IEnumerable<Task<Tuple<string, StockData[]>>> stockHistoryTasks =
                 // TODO LAB add ToList to run in parallel
-                stockSymbols.Select(stock => ProcessStockHistory(stock, cTok));
+                stockSymbols.Select(async stock =>
+                {
+                    using (var gate = await requestGate.AsyncAcquire(TimeSpan.Zero, cTok))
+                        return await ProcessStockHistory(stock, cTok);
+                });
 
             // TODO LAB replace the foreach loop using
             // (1) Control the degree of parallelism using "RequestGate.cs"

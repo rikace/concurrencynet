@@ -36,7 +36,13 @@ namespace RxConcurrentStockTickers
                                 //        EX: stock.Date = startData + TimeSpan.FromDays(tick);
                                 //        The combined stream should return the Stock type
                                 //
-                                .Select(_ => default(StockData)); // <= remove this line (compilation purpose)
+                                // .Select(_ => default(StockData)); // <= remove this line (compilation purpose)
+
+                                .Zip(x.ObserveLines(), (tick, stock) =>
+                                {
+                                    stock.Date = startData + TimeSpan.FromDays(tick);
+                                    return stock;
+                                });
                         }
                     )
                     // TODO LAB
@@ -47,7 +53,8 @@ namespace RxConcurrentStockTickers
                     //      where the stream of event is generated "FileLinesStream"
                     //
                     // Replace the following line of code with the correct implementation
-                    .ToObservable().SelectMany(i => i);
+                    //.ToObservable().SelectMany(i => i);
+                    .Aggregate((o1, o2) => o1.Merge(o2));
         }
 
         public static void RxStream()

@@ -11,7 +11,7 @@ let main argv =
 
     let initialCentroidsSet = data |> getRandomCentroids 11
 
-    // TODO
+    // TODO LAB
     //  complete the Map-Reduce function in MapReduce.FsPSeq.fs file
     let run () = kmeans data dist initialCentroidsSet
 
@@ -36,4 +36,4 @@ let main argv =
 
 
     Console.ReadLine() |> ignore
-    0 // return an integer exit code
+    0

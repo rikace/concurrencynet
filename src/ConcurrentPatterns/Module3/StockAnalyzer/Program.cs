@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace StockAnalyzer
 {
-    class qProgram
+    class Program
     {
         static void Main(string[] args)
         {

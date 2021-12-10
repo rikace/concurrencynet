@@ -28,17 +28,19 @@ namespace Pipeline.PipelinePatterns
 
         public void AddStep<TIn, TLocalOut>(Func<TIn, Task<TLocalOut>> stepFunc)
         {
-            // TODO
+            // TODO LAB
             // Implement a step that
             // (1) create a TPL Dataflow block that handles the "stepFunc" function
             //     for mapping the input TIn to output TLocalOut
-
-            // add implementation
-            IDataflowBlock step = default;
-
+            var step = new TransformBlock<TIn, TLocalOut>(async input =>
+                await stepFunc(input));
             if (_steps.Count > 0)
             {
-                // (2) append/link the block created (1) to the last block from the "_steps" list.
+                // (2) append/link the block created (1) to the last from the "_steps" list.
+
+                var lastStep = _steps.Last();
+                var targetBlock = (lastStep as ISourceBlock<TIn>);
+                targetBlock.LinkTo(step, new DataflowLinkOptions());
             }
 
             _steps.Add(step);
@@ -71,9 +73,13 @@ namespace Pipeline.PipelinePatterns
                 pipeline.Post(image);
             }
 
-            // TODO
-            // Optimize the pipeline:
-            // add degree of parallelism and/or buffer and/or cancellation
+            // TODO LAB
+            // add parallelism and buffer amd cancellation?
+            // var options = new ExecutionDataflowBlockOptions()
+            //     {
+            //         MaxDegreeOfParallelism = dop,
+            //         BoundedCapacity = 5,
+            //     };
         }
     }
 }

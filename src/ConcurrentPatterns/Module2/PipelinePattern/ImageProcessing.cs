@@ -34,9 +34,9 @@ namespace ConsoleTaskEx
 
             var files = Directory.GetFiles(source, "*.jpg");
 
-            // TODO
+            // TODO LAB
             // Complete the ParallelPatterns missing code
-            // "Pipeline.cs"
+            // "ParallelPatterns/ParallelPatterns.cs"
             var imagePipe =
                 ParallelPatterns.Pipeline<string, ImageInfo>.Create(imageProcessingHelpers.LoadImage_Step1);
 

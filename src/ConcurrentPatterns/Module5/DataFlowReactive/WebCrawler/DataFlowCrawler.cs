@@ -17,12 +17,7 @@ namespace CSharpWebCrawler
     using System.Threading.Tasks;
     using System.Threading.Tasks.Dataflow;
     using System.Text.RegularExpressions;
-    using System.Collections.Concurrent;
-    using HtmlAgilityPack;
-    using System.Linq;
-    using Memoization = ConcurrentPatterns.Memoization;
 
-    // TODO RT
     public static class DataFlowCrawler
     {
         static int index = 0;
@@ -52,14 +47,13 @@ namespace CSharpWebCrawler
         // why are we using "ThreadLocal" ?
         private static ThreadLocal<Regex> httpRgx = new ThreadLocal<Regex>(() => new Regex(@"^(http|https|www)://.*$"));
 
-        public static Func<T, R> MemoizeThreadSafe<T, R>(Func<T, R> func) where T : IComparable
+        public static Func<T, Task<R>> MemoizeThreadSafe<T, R>(Func<T, Task<R>> func) where T : IComparable
         {
-            ConcurrentDictionary<T, R> cache = new ConcurrentDictionary<T, R>();
-            return arg => cache.GetOrAdd(arg, a => func(a));
+            ConcurrentDictionary<T, Lazy<Task<R>>> cache = new ConcurrentDictionary<T, Lazy<Task<R>>>();
+            return arg => cache.GetOrAdd(arg, a => new Lazy<Task<R>>(() => func(a))).Value;
         }
 
-
-        public static IDisposable Start(List<string> urls, int dop, Func<string, byte[], Task> compute)
+        public static async Task<IDisposable> Start(List<string> urls, int dop, Func<string, byte[], Task> compute)
         {
             // TODO LAB
             // in order, try to increase the level of parallelism,
@@ -67,8 +61,8 @@ namespace CSharpWebCrawler
             // Maybe first try with a time expiration, then add cancellation semantic
             var downloaderOptions = new ExecutionDataflowBlockOptions()
             {
-                // TODO should we pass the MaxDegreeOfParallelism as input/argument in function
-                MaxDegreeOfParallelism = dop// more then 1 ?
+                MaxDegreeOfParallelism = dop,
+
             };
 
             // TODO LAB
@@ -76,7 +70,7 @@ namespace CSharpWebCrawler
             // downloads the web page of a given URL
             // Can you avoid to re-compute the same page?
             // Look into the "Memoize.cs" file for ideas
-            Func<string, Task<string>> downloadUrl = Memoization.MemoizeThreadSafe<string, string>(async (url) =>
+            Func<string, Task<string>> downloadUrl = MemoizeThreadSafe<string, string>(async (url) =>
             {
                 // TODO LAB
                 // implement a download web page
@@ -118,10 +112,10 @@ namespace CSharpWebCrawler
                     var doc = new HtmlDocument();
                     doc.LoadHtml(html);
 
-                var links =
-                    from link in doc.DocumentNode.Descendants("a")
-                    where link.Attributes.Contains("href")
-                    select link.GetAttributeValue("href", "");
+                    var links =
+                        from link in doc.DocumentNode.Descendants("a")
+                        where link.Attributes.Contains("href")
+                        select link.GetAttributeValue("href", "");
 
                     var linksValidated =
                         from link in links
@@ -204,6 +198,7 @@ namespace CSharpWebCrawler
             // Download the image and run the "compute" function
             // What will happen in case of error?
             // Can you write a defensive code to handle errors?
+
             var writer = new ActionBlock<string>(async url =>
             {
                 url = url.StartsWith("http") ? url : "http:" + url;
@@ -274,7 +269,9 @@ namespace CSharpWebCrawler
             // Where should you link this block?
             // how do you ensure that all the images are parse also in case of Odd numbers?
             foreach (var url in urls)
-                downloader.Post(url);
+            {
+                await downloader.SendAsync(url);
+            }
 
             // TODO LAB
             // add cancellation token to the pipeline.

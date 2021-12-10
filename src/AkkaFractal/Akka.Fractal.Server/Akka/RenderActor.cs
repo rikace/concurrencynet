@@ -59,8 +59,9 @@ namespace AkkaFractal.Web.Akka
             // implement the two Actor Receiver that handle the message types:
             // - RenderedTile
             // - Completed
-
-            // CODE HERE
+            
+            ReceiveAsync<RenderedTile>(renderedTileAction);
+            Receive<Completed>(complete);
         }
     }
 }

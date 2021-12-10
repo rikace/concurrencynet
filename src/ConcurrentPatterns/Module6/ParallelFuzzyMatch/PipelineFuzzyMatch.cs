@@ -24,7 +24,9 @@ namespace ParallelPatterns
 
     public partial class ParallelFuzzyMatch
     {
-        public static void RunFuzzyMatchPipelineCSharp(string[] wordsLookup, IList<string> files)
+        public static void RunFuzzyMatchPipelineCSharp(
+            string[] wordsLookup,
+            IList<string> files)
         {
             // TODO LAB : In the previous example you have implemented the Monadic operator SelectMany (usually called Bind)
             // This operator enables the compiler to understand the monadic (LINQ) pattern, which allows you to write
@@ -91,7 +93,8 @@ namespace ParallelPatterns
 
             var readFileTasks =
                 (from file in files
-                 select File.ReadAllTextAsync(file)).ToList();
+                 select File.ReadAllTextAsync(file)
+                ).ToList();
 
             while (readFileTasks.Count > 0)
             {

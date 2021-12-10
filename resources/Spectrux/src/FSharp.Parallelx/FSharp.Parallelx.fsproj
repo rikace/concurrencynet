@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\netfx.props" />
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="EventEx\EventAggregator.fs" />
+    <Compile Include="EventEx\GlobalEvents.fs" />
+    <Compile Include="FSharpFuncUtils.fs" />
+    <Compile Include="TaskBuilder.fs" />
+    <Compile Include="Utilities.fs" />
+    <Compile Include="Result.fs" />
+    <Compile Include="ThreadSafeRandom.fs" />
+    <Compile Include="Courotine.fs" />
+    <Compile Include="Interop.fs" />
+    <Compile Include="Partitioner.fs" />
+    <Compile Include="Atom.fs" />
+    <Compile Include="Transaction.fs" />
+    <Compile Include="Caching.fs" />
+    <Compile Include="OptionCombinators.fs" />
+    <Compile Include="ResultCombinators.fs" />
+    <Compile Include="SharedMemoryManager.fs" />
+    <Compile Include="TaskEx\TaskCombinators.fs" />
+    <Compile Include="TaskEx\TaskExtensions.fs" />
+    <Compile Include="TaskEx\LazyTask.fs" />
+    <Compile Include="TaskEx\TaskResult.fs" />
+    <Compile Include="AsyncEx\AsyncBuilderEx.fs" />
+    <Compile Include="AsyncEx\AsyncCombinators.fs" />
+    <Compile Include="AsyncEx\AsyncExtensions.fs" />
+    <Compile Include="AsyncEx\AsyncSeq.fs" />
+    <Compile Include="AsyncEx\AsyncResult.fs" />
+    <Compile Include="AsyncEx\AsyncOptions.fs" />
+    <Compile Include="AsyncEx\AsyncDependecies.fs" />
+    <Compile Include="AsyncEx\AsyncGates.fs" />
+    <Compile Include="AsyncEx\DAGOperations.fs" />
+    <Compile Include="AsyncEx\AsyncResultBuilder.fs" />
+    <Compile Include="AsyncEx\RequestGate.fs" />
+    <Compile Include="AsyncEx\AsyncChannel.fs" />
+    <Compile Include="AsyncEx\AsyncStream.fs" />
+    <Compile Include="AsyncEx\AsyncApplicative.fs" />
+    <Compile Include="AsyncEx\ParallelAsyncBuilder.fs" />
+    <Compile Include="EventEx\EventEx.fs" />
+    <Compile Include="Structures/CircularBuffer.fs" />
+    <Compile Include="Structures/CollectionsEx.fs" />
+    <Compile Include="Structures/ConcurrentCollections.fs" />
+    <Compile Include="Structures/HashMultimap.fs" />
+    <Compile Include="Structures/StreamQueue.fs" />
+    <Compile Include="Structures/Trie.fs" />
+    <Compile Include="Structures/BTree.fs" />
+    <Compile Include="Structures\MVar.fs" />
+    <Compile Include="Structures\Unrolled.fs" />    
+    <Compile Include="AgentEx\AgentUtils.fs" />
+    <Compile Include="AgentEx\ParallelAgents.fs" />
+    <Compile Include="AgentEx\AgentPipe.fs" />    
+    <Compile Include="AgentEx\AgentRef.fs" />
+    <Compile Include="AgentEx\DataFlowAgent.fs" />
+    <Compile Include="AgentEx\AgentMB.fs" />
+    <Compile Include="AgentEx\AgentObservable.fs" />
+    <Compile Include="AgentEx\Mailbox.fs" />
+    <Compile Include="AgentEx\AgentPatterns\ResilientMailbox.fs" />
+    <Compile Include="AgentEx\AgentPatterns\ThrottlingAgent.fs" />
+    <Compile Include="AgentEx\AgentPatterns\BlockingQueueAgent.fs" />
+    <Compile Include="AgentEx\AgentPatterns\CircularQueueAgent.fs" />
+    <Compile Include="AgentEx\AgentPatterns\MapBufferAgent.fs" />
+    <Compile Include="AgentEx\AgentPatterns\SchedulerAgent.fs" />
+    <Compile Include="AgentEx\AgentPatterns\RateLimitAgent.fs" />
+    <Compile Include="AgentEx\AgentPatterns\ProcessQueue.fs" />
+    <Compile Include="AgentEx\AgentPatterns\AgentCache.fs" />
+    <Compile Include="AgentEx\AgentPatterns\ObjectPool.fs" />
+    <Compile Include="AgentEx\AgentPatterns\BulkAgent.fs" />
+    <Compile Include="AgentEx\AgentPatterns\CircularStream.fs" />
+    <Compile Include="AgentEx\Agent.fs" />
+    <Compile Include="AgentEx\Actors.fs" />
+    <Compile Include="AgentEx\ConcurrentAgents.fs" />
+    <Compile Include="ChannelEx\ChannelEx.fs" />
+    <Compile Include="ChannelEx\Channel.fs" />
+    <Compile Include="ChannelEx\TaskChannelEx.fs" />
+    <Compile Include="Combinators.fs" />
+    <Compile Include="ConcurrentValues.fs" />
+    <Compile Include="Experiments\AsyncArrow.fs" />
+    <Compile Include="Experiments\State.fs" />
+    <Compile Include="Experiments\ParallelNumbers.fs" />
+    <Compile Include="Experiments\GifEncoder.fs" />
+    <Compile Include="Experiments\Vec.fs" />
+    <Compile Include="Experiments\Task.fs" />
+    <Compile Include="Experiments\Schedule.fs" />
+    <Compile Include="Experiments\Random.fs" />
+    <Compile Include="Experiments\RWLock.fs" />
+    <Compile Include="Experiments\Prolog.fs" />
+    <Compile Include="Experiments\Memory.fs" />
+    <Compile Include="Experiments\LazyTask.fs" />
+    <Compile Include="Experiments\Hlc.fs" />
+    <Compile Include="Experiments\Enum.fs" />
+    <Compile Include="Experiments\Channels.fs" />
+    <Compile Include="Experiments\Atomic.fs" />
+    <Compile Include="Experiments\AsyncSeq.fs" />
+    <Compile Include="Experiments\AsyncExtensions.fs" />
+    <Compile Include="Experiments\Art.fs" />
+    <Compile Include="Experiments\Array.fs" />
+    <Compile Include="Experiments\Actors.fs" />
+    <Compile Include="Workflow.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.8.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="paket.references" />
+    <Compile Include="AffinityScheduler.fs" />
+    <Compile Include="Stream.fs" />
+    <Compile Include="Fibers.fs" />
+    <Compile Include="Pipelets.fs" />
+    <Compile Include="ParallelSIMD.fs" />
+    <Compile Include="Registry.fs" />
+    <Compile Include="Memory.fs" />
+    <None Include="Script.fsx" />
+    <None Include="AggregatorScript.fsx" />
+    <Compile Include="Network\Network.fs" />
+    <Compile Include="Network\NetStream.fs" />
+    <Folder Include="Extensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EventEx\EventEx.fs" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>

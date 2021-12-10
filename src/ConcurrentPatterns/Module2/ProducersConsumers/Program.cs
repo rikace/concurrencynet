@@ -37,12 +37,20 @@ namespace ProducersConsumers
             // TODO 3
             //pc.Run(new[]{sourceImages,sourcePaintings}, destination);
 
-            // Example how to Async/Stream Channel
-            //     await foreach (var receivedItem in channel.ReadAllAsync())
-            //     {
-            //         var outputItem = await imageProcessingHelpers.SaveImage_Step4(receivedItem);
-            //         // do something with outputItem
-            //     }
+            // var pc = new ProducerConsumer.BlockingCollectionProdCons();
+            // pc.Run(source, destination);
+
+            // var pc = new ProducersConsumers.ChannelProdsCons();
+            // pc.Run(source, destination);
+
+
+
+            //var pc = new ProdConsImplementations.ChannelMultiProdMultiCons();
+            //pc.Run(new[]{sourceImages,sourcePaintings}, destination);
+
+
+
+            // TODO Check partial implementation of "MultiThreadedProdCons"
 
             Console.WriteLine("Complete!");
             Console.ReadLine();

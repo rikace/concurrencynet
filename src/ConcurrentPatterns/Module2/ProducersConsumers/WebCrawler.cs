@@ -73,6 +73,17 @@ namespace Dataflow.WebCrawler
             // Add missing code here
             // check the API of the "BlockingCollection" to get the an item safely
             // Use the Memoize function to check if a web page has been already visited
+            while (pending.TryTake(out var url))
+            {
+                var content = await DownloadDocument(url);
+                var tilte = GetTitle(content);
+                Console.WriteLine($"The title of {url} is {tilte}");
+
+                foreach (var link in ExtractLinks(content))
+                {
+                    pending.Add(link);
+                }
+            }
         }
 
         // --------------------------------------------------------------

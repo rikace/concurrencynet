@@ -74,10 +74,9 @@ namespace ParallelPatterns
         // TODO LAB
         public void Enqueue(TInput item)
         {
-            // TODO complete missing code
-            // We nee to enqueue the input into a callBack
-            // for the collection "continuations" avoiding contentions
-
+            var sw = new SpinWait();
+            while (!(BlockingCollection<TInput>.TryAddToAny(_input, item) >= 0))
+                sw.SpinOnce();
         }
 
         private async Task Run()
@@ -94,6 +93,21 @@ namespace ParallelPatterns
             // Bonus :  avoid contention in case of empty queue.
             //          Check "SpinWait" (use above instance "sw")
 
+            while (!_input.All(bc => bc.IsCompleted) && !_token.IsCancellationRequested)
+            {
+                var i = BlockingCollection<TInput>.TryTakeFromAny(_input, out var receivedItem, 50, _token);
+                if (i >= 0)
+                {
+                    TOutput outputItem =
+                        _processor != null ? _processor(receivedItem) : await _processTask(receivedItem);
+                    BlockingCollection<TOutput>.AddToAny(Output, outputItem);
+                    sw.SpinOnce();
+                }
+                else
+                {
+                    Thread.SpinWait(1000);
+                }
+            }
 
             if (Output != null)
             {

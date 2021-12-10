@@ -6,7 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CommonHelpers
-{    public static class CollectionEx
+{
+    public static class CollectionEx
     {
         public static IEnumerable<string> EnumLines(this StringReader reader)
         {

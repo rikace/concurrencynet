@@ -40,8 +40,8 @@ namespace ConsoleTaskEx
                         // task Error and task Cancellation (in a centralize manner)
                         return imageProcessingHelpers.ScaleImage_Step2(imageInfo.Result);
                     }).Unwrap()
-                    .ContinueWith(imageInfo => { return imageProcessingHelpers.ConvertTo3D_Step3(imageInfo.Result); }).Unwrap()
-                    .ContinueWith(imageInfo => { imageProcessingHelpers.SaveImage_Step4(imageInfo.Result); });
+                    .ContinueWith(imageInfo => imageProcessingHelpers.ConvertTo3D_Step3(imageInfo.Result)).Unwrap()
+                    .ContinueWith(imageInfo => imageProcessingHelpers.SaveImage_Step4(imageInfo.Result));
             }
         }
 
@@ -62,14 +62,15 @@ namespace ConsoleTaskEx
             // Task SelectMany
             // in "Common/Helpers.TaskComposition.cs"
 
-            Func<string, Task<ImageInfo>> transformer = imagePath =>
-                from image in imageProcessingHelpers.LoadImage_Step1(imagePath)
-                from scaleImage in imageProcessingHelpers.ScaleImage_Step2(image)
-                from converted3DImage in imageProcessingHelpers.ConvertTo3D_Step3(scaleImage)
-                select converted3DImage;
+            Func<string, Task<ImageInfo>> transformer =
+                imagePath =>
+                    from image in imageProcessingHelpers.LoadImage_Step1(imagePath)
+                    from scaleImage in imageProcessingHelpers.ScaleImage_Step2(image)
+                    from converted3DImage in imageProcessingHelpers.ConvertTo3D_Step3(scaleImage)
+                    select converted3DImage;
 
             foreach (string fileName in files)
-                // Task Then / SelectMany pipeline
+                // Task Then / SelectMany
                 await transformer(fileName).Then(imageProcessingHelpers.SaveImage_Step4);
 
                 // Option using Task.WhenAll
@@ -81,6 +82,10 @@ namespace ConsoleTaskEx
                 //       - Option using Task.WhenAll
                 //       - Throttle the tasks
 
+
+            // await Task.WhenAll(
+            //     files.Select(fileName => transformer(fileName).Then(saveImage_Step4))
+            // );
         }
     }
 }

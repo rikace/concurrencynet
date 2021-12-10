@@ -125,13 +125,14 @@ namespace ParallelPatterns
             // return tLocal += Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1 ? 1 : 0;
 
             // UNCOMMENT : Parallel.For(0, iterations,
-            //             name of ThreadLocal variable "tLocal
+            //             name of ThreadLocal variable "tLocal   
 
             // TODO LAB
             Parallel.For(0, iterations,
                 // doesn't make sense to use more threads than we have processors
                 new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount },
-                () => 0, (i, _, tLocal) =>
+                () => 0,
+                (i, _, tLocal) =>
                 {
                     double a, b;
                     return tLocal += Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1
@@ -140,12 +141,14 @@ namespace ParallelPatterns
                 },
                 subTotal => Interlocked.Add(ref inCircle, subTotal));
 
-            return ((double) inCircle / iterations) * 4;
+            return ((double)inCircle / iterations) * 4;
         }
 
         public static double PLINQCalculate(int iterations)
         {
             var random = new Helpers.ThreadSafeRandom();
+
+            // TODO LAB
             var inCircle = ParallelEnumerable.Range(0, iterations)
                 // doesn't make sense to use more threads than we have processors
                 .WithDegreeOfParallelism(Environment.ProcessorCount)
@@ -154,11 +157,14 @@ namespace ParallelPatterns
                     double a, b;
                     return Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1;
                 })
+                // .Sum(_ => 1);  // REMOVE THIS LINE TO COMPLETE THE TASK
+                // TODO
                 .Aggregate<bool, int, int>(
                     0, // Seed
                     (agg, val) => val ? agg + 1 : agg, // Iterations
                     (agg, subTotal) => agg + subTotal, // Aggregating subtotals
                     result => result); // No projection of result needed
+
 
             // Implement the sum of the parallel query using the apposite operator
             // NOTE : check the "Aggregate" as possible solution
@@ -181,8 +187,12 @@ namespace ParallelPatterns
                     double a, b;
                     return Math.Sqrt((a = random.NextDouble()) * a + (b = random.NextDouble()) * b) <= 1;
                 })
-                .Sum(_ => 1);  // REMOVE THIS LINE TO COMPLETE THE TASK
-
+               //.Sum(_ => 1);  // REMOVE THIS LINE TO COMPLETE THE TASK
+                .Aggregate<bool, int, int>(
+                    0, // Seed
+                    (agg, val) => val ? agg + 1 : agg, // Iterations
+                    (agg, subTotal) => agg + subTotal, // Aggregating subtotals
+                    result => result); // No projection of result needed
             // TODO LAB
             // Use the previous implementation from "PLINQCalculate", in this case
             // apply a "Partitioner" to improve the performance

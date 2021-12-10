@@ -18,7 +18,7 @@ module AsyncQueue =
         let waitingConsumers, elts, waitingProducers = Queue(), Queue<'T>(), Queue()
         let cancellationToken = defaultArg cancellationToken (new CancellationTokenSource())
 
-(*  The following balance function shuffles as many elements through the queue
+(*  The following "balance" function shuffles as many elements through the queue
     as possible by dequeuing if there are elements queued and consumers waiting
     for them and enqueuing if there is capacity spare and producers waiting *)
         let rec balance() =

@@ -20,9 +20,9 @@ namespace AsyncOperations
         // complete the MemoizeThreadSafe implementation
         // Thread-safe memoization function
         public static Func<string, IEnumerable<string>> WebCrawlerMemoizedThreadSafe =
-            Memoization.MemoizeThreadSafe<string, IEnumerable<string>>(WebCrawler);
+            Memoization.MemoizeLazyThreadSafe<string, IEnumerable<string>>(WebCrawler);
 
-        // TODO : 1.4
+        // TODO LAB
         // Implement WebCrawlerMemoizedThreadSafe functions for a thread save memoization (lazy evaluation optional)
         public static IEnumerable<string> WebCrawler(string url)
         {
@@ -85,7 +85,12 @@ namespace AsyncOperations
 
             BenchPerformance.Time("Thread-safe memoization function", () =>
             {
-                // TODO RT solution
+                // TODO LAB
+                //  (1) implement parallel web crawler with thread safe memoization
+                //  go to the Memoziation file
+                //  var webPageTitles = new int[] { };
+
+                // TODO LAB
                 var webPageTitles = from url in urls.AsParallel()
                     from pageContent in WebCrawlerMemoizedThreadSafe(url)
                     select ExtractWebPageTitle(pageContent);

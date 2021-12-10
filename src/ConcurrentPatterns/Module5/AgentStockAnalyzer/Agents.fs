@@ -31,6 +31,7 @@
     //          1) Use the Agent timer built in (TryReceive)
     //          2) Use Reactive Extensions with Observable.Interval
     //             and subscribe the Observer to "Post" the updated price to the Agent
+
     let stockAgent (stockSymbol:string, chartAgent:Agent<ChartSeriesMessage>) =
         Agent<StockAgentMessage>.Start(fun inbox ->
             let rec loop stockPrice  = async {
@@ -56,14 +57,27 @@
     //              WatchStock    and   UnWatchStock
 
     let stocksCoordinatorAgent(lineChartingAgent:Agent<ChartSeriesMessage>) =
+        // Unchecked.defaultof<Agent<StocksCoordinatorMessage>>
+        // add missing code here
 
         let stockAgents = Dictionary<string, Agent<StockAgentMessage>>()
         Agent<StocksCoordinatorMessage>.Start(fun inbox ->
-                let rec loop() = async.Return()
-
-                // add missing code here
-
-                loop())
+                let rec loop() = async {
+                    let! msg = inbox.Receive()
+                    match msg with
+                    | WatchStock(s, c) ->
+                        if not <| stockAgents.ContainsKey(s) then
+                            let stockAgentChild = stockAgent(s, lineChartingAgent)
+                            stockAgents.Add(s, stockAgentChild)
+                            lineChartingAgent.Post(AddSeriesToChart(s, c))
+                        return! loop()
+                    | UnWatchStock(s) ->
+                        if stockAgents.ContainsKey(s) then
+                             lineChartingAgent.Post(RemoveSeriesFromChart(s))
+                             (stockAgents.[s] :> IDisposable).Dispose()
+                             stockAgents.Remove(s) |> ignore
+                        return! loop() }
+                loop() )
 
 
     type LineSeries = {series:decimal list; color:ConsoleColor}

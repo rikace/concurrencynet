@@ -24,8 +24,11 @@ open SixLabors.ImageSharp.PixelFormats
 //               internal state of the function
 
 let agent computation = Agent<'a * AsyncReplyChannel<'b>>.Start(fun inbox ->
-    let rec loop () = async.Return()
-    // add missing code here
+    let rec loop () = async {
+        let! msg, replyChannel = inbox.Receive()
+        let res = computation msg
+        replyChannel.Reply res
+        return! loop() }
     loop() )
 
 // Step (2) compose agents implementing the "pipeline" function.
@@ -35,7 +38,8 @@ let agent computation = Agent<'a * AsyncReplyChannel<'b>>.Start(fun inbox ->
 //          - Try also to implement a function that handle Async computation
 
 let pipelineAgent (f:'a -> 'b) (m: 'a) : Async<'b> =
-    async.Return(Unchecked.defaultof<_>) // Replace with code implementation
+    let a = agent f
+    a.PostAndAsyncReply(fun replyChannel -> m, replyChannel)
 
 
 // Step (3) compose pipeline

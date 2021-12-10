@@ -48,8 +48,7 @@ namespace AsyncStreamEx
             return result;
         }
 
-        // TODO LAB
-        // convert this as demo to IAsyncEnumerable
+        // TODO LAB convert this as demo to IAsyncEnumerable
         static async Task<IEnumerable<int>> SumFromOneToCountTaskIEnumerable(int count)
         {
             ConsoleExt.WriteLine("SumFromOneToCountAsyncIEnumerable called!");
@@ -68,6 +67,22 @@ namespace AsyncStreamEx
             return result;
         }
 
+        static async IAsyncEnumerable<int> SumFromOneToCountTaskAsyncEnumerable(int count)
+        {
+            ConsoleExt.WriteLine("SumFromOneToCountAsyncIEnumerable called!");
+            yield return await Task.Run(() =>
+            {
+                var sum = 1;
+                for (var i = 0; i < count; i++)
+                {
+                    sum = sum + i;
+
+                }
+
+                return sum;
+            });
+        }
+
         static IEnumerable<int> ProduceAsyncSumSequence(int count)
         {
             ConsoleExt.WriteLineAsync("ProduceAsyncSumSequence Called");
@@ -78,6 +93,21 @@ namespace AsyncStreamEx
                 sum = sum + i;
                 Task.Delay(TimeSpan.FromSeconds(0.5)).Wait();
                 yield return sum;
+            }
+        }
+
+        static async IAsyncEnumerable<int> SumFromOneToCountTaskIAsyncEnumerable(int count)
+        {
+            ConsoleExt.WriteLine("SumFromOneToCountTaskIAsyncEnumerable called!");
+
+            var sum = 1;
+            for (var i = 0; i < count; i++)
+            {
+                yield return await Task.Run<int>(async () =>
+                {
+                    await Task.Delay(10);
+                    return sum = sum + i;
+                });
             }
         }
 
@@ -94,25 +124,28 @@ namespace AsyncStreamEx
 
         static async Task Main(string[] args)
         {
-            // TODO / STEP 1
-            IAsyncEnumerable<int> pullBasedAsyncSequence = ProduceAsyncSumSequence(5).ToAsyncEnumerable();
-            var consumingTask = Task.Run(() => ConsumeAsyncSumSequence(pullBasedAsyncSequence));
-
-            // Just for demo! Wait until the task is finished!
-            consumingTask.Wait();
-
-            ConsoleExt.WriteLineAsync("Async Streams Demo Done!");
-            Console.ReadLine();
+            // TODO LAB
+            // IAsyncEnumerable<int> pullBasedAsyncSequence = ProduceAsyncSumSequence(5).ToAsyncEnumerable();
+            // var consumingTask = Task.Run(() => ConsumeAsyncSumSequence(pullBasedAsyncSequence));
+            //
+            // // Just for demo! Wait until the task is finished!
+            // consumingTask.Wait();
+            //
+            // ConsoleExt.WriteLineAsync("Async Streams Demo Done!");
+            // Console.ReadLine();
 
 
             // TODO / STEP 2
             // uncomment and fix the code
-            // IAsyncEnumerable<int> seq = SumFromOneToCountTaskIEnumerable(5);
+            IEnumerable<int> seq = await SumFromOneToCountTaskIEnumerable(5);
 
-            // await foreach (var item in seq)
-            // {
-            //     Console.WriteLine($"Value {item} - Thread ID# {Thread.CurrentThread.ManagedThreadId}");
-            // }
+
+            IAsyncEnumerable<int> asyncSeq = SumFromOneToCountTaskAsyncEnumerable(5);
+
+            await foreach (var item in asyncSeq)
+            {
+                Console.WriteLine($"Value {item} - Thread ID# {Thread.CurrentThread.ManagedThreadId}");
+            }
 
             Console.WriteLine("Complete");
             Console.ReadLine();
